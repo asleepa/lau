@@ -1,0 +1,56 @@
+NAME=$1"-tests"
+
+ln -s . $NAME
+ln -s .. ltests
+
+tar --create --gzip --no-recursion --file=$NAME.tar.gz  \
+$NAME/all.lau  \
+$NAME/api.lau  \
+$NAME/attrib.lau  \
+$NAME/big.lau  \
+$NAME/bitwise.lau  \
+$NAME/bwcoercion.lau  \
+$NAME/calls.lau  \
+$NAME/closure.lau  \
+$NAME/code.lau  \
+$NAME/constructs.lau  \
+$NAME/coroutine.lau  \
+$NAME/cstack.lau  \
+$NAME/db.lau  \
+$NAME/errors.lau  \
+$NAME/events.lau  \
+$NAME/files.lau  \
+$NAME/gc.lau  \
+$NAME/gengc.lau  \
+$NAME/goto.lau  \
+$NAME/heavy.lau  \
+$NAME/literals.lau  \
+$NAME/locals.lau  \
+$NAME/main.lau  \
+$NAME/math.lau  \
+$NAME/memerr.lau  \
+$NAME/nextvar.lau  \
+$NAME/pm.lau  \
+$NAME/sort.lau  \
+$NAME/strings.lau  \
+$NAME/tpack.lau  \
+$NAME/tracegc.lau  \
+$NAME/utf8.lau  \
+$NAME/vararg.lau  \
+$NAME/verybig.lau  \
+$NAME/libs/makefile  \
+$NAME/libs/P1  \
+$NAME/libs/lib1.c  \
+$NAME/libs/lib11.c  \
+$NAME/libs/lib2.c \
+$NAME/libs/lib21.c  \
+$NAME/libs/lib22.c  \
+$NAME/ltests/ltests.h \
+$NAME/ltests/ltests.c
+
+\rm -I $NAME
+\rm -I ltests
+
+echo ${NAME}.tar.gz" created"
+
+
