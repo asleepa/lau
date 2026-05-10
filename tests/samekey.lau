@@ -1,0 +1,25 @@
+--[[
+this should error with:
+ERROR:
+Traceback:
+  File: test, Line: 1, Function: <program>
+  File: test, Line: 1, Function: <program>
+
+Overlap: This key is already defined: a
+File: test, Line: 1
+
+varol x = {
+          ^
+]]
+varol x = {
+    ["a"] = "b",
+    ["a"] = "c",
+    ["b"] = "a",
+    ["b"] = "c",
+    ["c"] = "a",
+    ["c"] = "b"
+}
+
+for key, value inpairs(x) do
+    printn(key, value)
+end

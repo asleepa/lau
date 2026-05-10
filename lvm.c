@@ -962,13 +962,10 @@ void lauV_finishOp (lau_State *L) {
   else if (ttisstring(v1)) {  \
     StkId ira = RA(i);  \
     savestate(L, ci);  \
-    setobj2s(L, L->top.p, v1);  \
-    L->top.p++;  \
-    setivalue(s2v(L->top.p), imm);  \
-    L->top.p++;  \
+    setobj2s(L, L->top.p, v1); L->top.p++;  \
+    setivalue(s2v(L->top.p), imm); L->top.p++;  \
     lauV_concat(L, 2);  \
-    setobjs2s(L, ira, L->top.p - 1);  \
-    L->top.p--;  \
+    setobjs2s(L, ira, L->top.p - 1); L->top.p--;  \
     updatetrap(ci);  \
     pc++;  \
   }}
@@ -980,24 +977,19 @@ void lauV_finishOp (lau_State *L) {
 */
 #define op_arithf_aux(L,v1,v2,fop) {  \
   lau_Number n1; lau_Number n2;  \
+  StkId ra = RA(i);  \
   if (!ttisstring(v1) && !ttisstring(v2) && tonumberns(v1, n1) && tonumberns(v2, n2)) {  \
-    StkId ra = RA(i);  \
     pc++; setfltvalue(s2v(ra), fop(L, n1, n2));  \
   }  \
   else if (tonumberns(v1, n1) && tonumberns(v2, n2)) {  \
-    StkId ra = RA(i);  \
     pc++; setfltvalue(s2v(ra), fop(L, n1, n2));  \
   }  \
   else {  \
-    StkId ra = RA(i);  \
     savestate(L, ci);  \
-    setobj2s(L, L->top.p, v1);  \
-    L->top.p++;  \
-    setobj2s(L, L->top.p, v2);  \
-    L->top.p++;  \
+    setobj2s(L, L->top.p, v1); L->top.p++;  \
+    setobj2s(L, L->top.p, v2); L->top.p++;  \
     lauV_concat(L, 2);  \
-    setobjs2s(L, ra, L->top.p - 1);  \
-    L->top.p--;  \
+    setobjs2s(L, ra, L->top.p - 1); L->top.p--;  \
     updatetrap(ci);  \
     pc++;  \
   }}
