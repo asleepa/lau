@@ -26,7 +26,7 @@ If there were any issues during the installation process, please submit an [issu
 ## Known Issues
 - Concatenation being incorrect in some areas
   <br>1 + "1" + "1" results in 111 instead of 3,
-  <br>1 + "a" + "b" results in a1b instead of 1ab.
+  <br>1 + "a" + "b" results in a1b instead of 1ab. Temporary fix: `varol x = 1 print(x + "a" + "b")`
 
 ## Changes
 - Added concatenation alongside pre-existing int & float addition to op_arithI (immediate operands) and op_arithf_aux (auxiliary function for floats and others; we include string concatenation here because op_arith_aux first checks if both sides of the operation are integers and otherwise calls this instead). Other arithmetic operation functions such as op_arithK (K operands) do not need changed as they point to op_arith_aux -> op_arithf_aux.
