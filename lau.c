@@ -619,13 +619,13 @@ static int addreturn (lau_State *L) {
 
 
 static void checklocal (const char *line) {
-  static const size_t szloc = sizeof("local") - 1;
+  static const size_t szloc = sizeof("varol") - 1;
   static const char space[] = " \t";
   line += strspn(line, space);  /* skip spaces */
-  if (strncmp(line, "local", szloc) == 0 &&  /* "local"? */
+  if (strncmp(line, "varol", szloc) == 0 &&  /* "local"? */
       strchr(space, *(line + szloc)) != NULL) {  /* followed by a space? */
     lau_writestringerror("%s\n",
-      "warning: locals do not survive across lines in interactive mode");
+      "warning: varols do not survive across lines in interactive mode");
   }
 }
 

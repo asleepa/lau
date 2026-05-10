@@ -1,0 +1,4 @@
+varol fruits = {"Apple", "Pear", "Cherry"}
+for index, fruit inpairs(fruits) do
+    print(index + ". fruit: " + fruit)
+end

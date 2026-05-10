@@ -707,22 +707,6 @@ static void lauK_float (FuncState *fs, int reg, lau_Number f) {
 
 
 /*
-** Get the value of 'var' in a register and generate an opcode to check
-** whether that register is nil. 'k' is the index of the variable name
-** in the list of constants. If its value cannot be encoded in Bx, a 0
-** will use '?' for the name.
-*/
-void lauK_codecheckglobal (FuncState *fs, expdesc *var, int k, int line) {
-  lauK_exp2anyreg(fs, var);
-  lauK_fixline(fs, line);
-  k = (k >= MAXARG_Bx) ? 0 : k + 1;
-  lauK_codeABx(fs, OP_ERRNNIL, var->u.info, k);
-  lauK_fixline(fs, line);
-  freeexp(fs, var);
-}
-
-
-/*
 ** Convert a constant in 'v' into an expression description 'e'
 */
 static void const2exp (TValue *v, expdesc *e) {
@@ -1592,6 +1576,28 @@ static void codearith (FuncState *fs, BinOpr opr,
 
 
 /*
+** Create code for '(e1 .. e2)'.
+** For '(e1 .. e2.1 .. e2.2)' (which is '(e1 .. (e2.1 .. e2.2))',
+** because concatenation is right associative), merge both CONCATs.
+*/
+static void codeconcat (FuncState *fs, expdesc *e1, expdesc *e2, int line) {
+  Instruction *ie2 = previousinstruction(fs);
+  if (GET_OPCODE(*ie2) == OP_CONCAT) {  /* is 'e2' a concatenation? */
+    int n = GETARG_B(*ie2);  /* # of elements concatenated in 'e2' */
+    lau_assert(e1->u.info + 1 == GETARG_A(*ie2));
+    freeexp(fs, e2);
+    SETARG_A(*ie2, e1->u.info);  /* correct first element ('e1') */
+    SETARG_B(*ie2, n + 1);  /* will concatenate one more element */
+  }
+  else {  /* 'e2' is not a concatenation */
+    lauK_codeABC(fs, OP_CONCAT, e1->u.info, 2, 0);  /* new concat opcode */
+    freeexp(fs, e2);
+    lauK_fixline(fs, line);
+  }
+}
+
+
+/*
 ** Code commutative operators ('+', '*'). If first operand is a
 ** numeric constant, change order of operands to try to use an
 ** immediate or K operator.
@@ -1602,7 +1608,7 @@ static void codecommutative (FuncState *fs, BinOpr op,
   if (tonumeral(e1, NULL)) {  /* is first operand a numeric constant? */
     swapexps(e1, e2);  /* change order */
     flip = 1;
-  }
+  };
   if (op == OPR_ADD && isSCint(e2))  /* immediate operand? */
     codebini(fs, OP_ADDI, e1, e2, flip, line, TM_ADD);
   else
@@ -1760,27 +1766,6 @@ void lauK_infix (FuncState *fs, BinOpr op, expdesc *v) {
   }
 }
 
-/*
-** Create code for '(e1 .. e2)'.
-** For '(e1 .. e2.1 .. e2.2)' (which is '(e1 .. (e2.1 .. e2.2))',
-** because concatenation is right associative), merge both CONCATs.
-*/
-static void codeconcat (FuncState *fs, expdesc *e1, expdesc *e2, int line) {
-  Instruction *ie2 = previousinstruction(fs);
-  if (GET_OPCODE(*ie2) == OP_CONCAT) {  /* is 'e2' a concatenation? */
-    int n = GETARG_B(*ie2);  /* # of elements concatenated in 'e2' */
-    lau_assert(e1->u.info + 1 == GETARG_A(*ie2));
-    freeexp(fs, e2);
-    SETARG_A(*ie2, e1->u.info);  /* correct first element ('e1') */
-    SETARG_B(*ie2, n + 1);  /* will concatenate one more element */
-  }
-  else {  /* 'e2' is not a concatenation */
-    lauK_codeABC(fs, OP_CONCAT, e1->u.info, 2, 0);  /* new concat opcode */
-    freeexp(fs, e2);
-    lauK_fixline(fs, line);
-  }
-}
-
 
 /*
 ** Finalize code for binary operation, after reading 2nd operand.
@@ -1801,11 +1786,6 @@ void lauK_posfix (FuncState *fs, BinOpr opr,
       lau_assert(e1->f == NO_JUMP);  /* list closed by 'lauK_infix' */
       lauK_concat(fs, &e2->t, e1->t);
       *e1 = *e2;
-      break;
-    }
-    case OPR_CONCAT: {  /* e1 .. e2 */
-      lauK_exp2nextreg(fs, e2);
-      codeconcat(fs, e1, e2, line);
       break;
     }
     case OPR_ADD: case OPR_MUL: {

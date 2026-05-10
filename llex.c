@@ -44,11 +44,11 @@
 /* ORDER RESERVED */
 static const char *const lauX_tokens [] = {
     "and", "break", "do", "else", "elseif",
-    "end", "false", "for", "function", "global", "goto", "if",
-    "in", "local", "nil", "not", "or", "repeat",
+    "end", "false", "for", "func", "if",
+    "varol", "null", "not", "or", "repeat",
     "return", "then", "true", "until", "while",
-    "//", "..", "...", "==", ">=", "<=", "~=",
-    "<<", ">>", "::", "<eof>",
+    "//", "...", "==", ">=", "<=", "~=",
+    "<<", ">>", "<eof>",
     "<number>", "<integer>", "<name>", "<string>"
 };
 
@@ -534,8 +534,7 @@ static int llex (LexState *ls, SemInfo *seminfo) {
       }
       case ':': {
         next(ls);
-        if (check_next1(ls, ':')) return TK_DBCOLON;  /* '::' */
-        else return ':';
+        return ':';
       }
       case '"': case '\'': {  /* short literal strings */
         read_string(ls, ls->current, seminfo);
@@ -546,7 +545,6 @@ static int llex (LexState *ls, SemInfo *seminfo) {
         if (check_next1(ls, '.')) {
           if (check_next1(ls, '.'))
             return TK_DOTS;   /* '...' */
-          else return TK_CONCAT;   /* '..' */
         }
         else if (!lisdigit(ls->current)) return '.';
         else return read_numeral(ls, seminfo);

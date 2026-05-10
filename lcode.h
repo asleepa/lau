@@ -68,8 +68,6 @@ LAUI_FUNC int lauK_codevABCk (FuncState *fs, OpCode o, int A, int B, int C,
 LAUI_FUNC int lauK_exp2const (FuncState *fs, const expdesc *e, TValue *v);
 LAUI_FUNC void lauK_fixline (FuncState *fs, int line);
 LAUI_FUNC void lauK_nil (FuncState *fs, int from, int n);
-LAUI_FUNC void lauK_codecheckglobal (FuncState *fs, expdesc *var, int k,
-                                                    int line);
 LAUI_FUNC void lauK_reserveregs (FuncState *fs, int n);
 LAUI_FUNC void lauK_checkstack (FuncState *fs, int n);
 LAUI_FUNC void lauK_int (FuncState *fs, int reg, lau_Integer n);

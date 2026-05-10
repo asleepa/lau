@@ -695,7 +695,7 @@ static const lauL_Reg pk_funcs[] = {
 
 
 static const lauL_Reg ll_funcs[] = {
-  {"require", ll_require},
+  {"req", ll_require},
   {NULL, NULL}
 };
 

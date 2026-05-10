@@ -1334,7 +1334,6 @@ static BinOpr getbinopr (int op) {
     case '~': return OPR_BXOR;
     case TK_SHL: return OPR_SHL;
     case TK_SHR: return OPR_SHR;
-    case TK_CONCAT: return OPR_CONCAT;
     case TK_NE: return OPR_NE;
     case TK_EQ: return OPR_EQ;
     case '<': return OPR_LT;
@@ -1538,12 +1537,6 @@ static int cond (LexState *ls) {
 }
 
 
-static void gotostat (LexState *ls, int line) {
-  TString *name = str_checkname(ls);  /* label's name */
-  newgotoentry(ls, name, line);
-}
-
-
 /*
 ** Break statement. Semantically equivalent to "goto break".
 */
@@ -1558,28 +1551,6 @@ static void breakstat (LexState *ls, int line) {
   bl->isloop = 2;  /* signal that block has pending breaks */
   lauX_next(ls);  /* skip break */
   newgotoentry(ls, ls->brkn, line);
-}
-
-
-/*
-** Check whether there is already a label with the given 'name' at
-** current function.
-*/
-static void checkrepeated (LexState *ls, TString *name) {
-  Labeldesc *lb = findlabel(ls, name, ls->fs->firstlabel);
-  if (l_unlikely(lb != NULL))  /* already defined? */
-    lauK_semerror(ls, "label '%s' already defined on line %d",
-                      getstr(name), lb->line);  /* error */
-}
-
-
-static void labelstat (LexState *ls, TString *name, int line) {
-  /* label -> '::' NAME '::' */
-  checknext(ls, TK_DBCOLON);  /* skip double colon */
-  while (ls->t.token == ';' || ls->t.token == TK_DBCOLON)
-    statement(ls);  /* skip other no-op statements */
-  checkrepeated(ls, name);  /* check for repeated labels */
-  createlabel(ls, name, line, block_follow(ls, 0));
 }
 
 
@@ -1733,7 +1704,6 @@ static void forlist (LexState *ls, TString *indexname) {
     new_localvar(ls, str_checkname(ls));
     nvars++;
   }
-  checknext(ls, TK_IN);
   line = ls->linenumber;
   adjust_assign(ls, 4, explist(ls, &e), &e);
   adjustlocalvars(ls, 3);  /* start scope for internal variables */
@@ -1753,8 +1723,8 @@ static void forstat (LexState *ls, int line) {
   varname = str_checkname(ls);  /* first variable name */
   switch (ls->t.token) {
     case '=': fornum(ls, varname, line); break;
-    case ',': case TK_IN: forlist(ls, varname); break;
-    default: lauX_syntaxerror(ls, "'=' or 'in' expected");
+    case ',': forlist(ls, varname); break;
+    default: lauX_syntaxerror(ls, "'=' expected");
   }
   check_match(ls, TK_END, TK_FOR, line);
   leaveblock(fs);  /* loop scope ('break' jumps to this point) */
@@ -1868,116 +1838,6 @@ static void localstat (LexState *ls) {
     adjustlocalvars(ls, nvars);
   }
   checktoclose(fs, toclose);
-}
-
-
-static lu_byte getglobalattribute (LexState *ls, lu_byte df) {
-  lu_byte kind = getvarattribute(ls, df);
-  switch (kind) {
-    case RDKTOCLOSE:
-      lauK_semerror(ls, "global variables cannot be to-be-closed");
-      return kind;  /* to avoid warnings */
-    case RDKCONST:
-      return GDKCONST;  /* adjust kind for global variable */
-    default:
-      return kind;
-  }
-}
-
-
-static void checkglobal (LexState *ls, TString *varname, int line) {
-  FuncState *fs = ls->fs;
-  expdesc var;
-  int k;
-  buildglobal(ls, varname, &var);  /* create global variable in 'var' */
-  k = var.u.ind.keystr;  /* index of global name in 'k' */
-  lauK_codecheckglobal(fs, &var, k, line);
-}
-
-
-/*
-** Recursively traverse list of globals to be initalized. When
-** going, generate table description for the global. In the end,
-** after all indices have been generated, read list of initializing
-** expressions. When returning, generate the assignment of the value on
-** the stack to the corresponding table description. 'n' is the variable
-** being handled, range [0, nvars - 1].
-*/
-static void initglobal (LexState *ls, int nvars, int firstidx, int n,
-                        int line) {
-  if (n == nvars) {  /* traversed all variables? */
-    expdesc e;
-    int nexps = explist(ls, &e);  /* read list of expressions */
-    adjust_assign(ls, nvars, nexps, &e);
-  }
-  else {  /* handle variable 'n' */
-    FuncState *fs = ls->fs;
-    expdesc var;
-    TString *varname = getlocalvardesc(fs, firstidx + n)->vd.name;
-    buildglobal(ls, varname, &var);  /* create global variable in 'var' */
-    enterlevel(ls);  /* control recursion depth */
-    initglobal(ls, nvars, firstidx, n + 1, line);
-    leavelevel(ls);
-    checkglobal(ls, varname, line);
-    storevartop(fs, &var);
-  }
-}
-
-
-static void globalnames (LexState *ls, lu_byte defkind) {
-  FuncState *fs = ls->fs;
-  int nvars = 0;
-  int lastidx;  /* index of last registered variable */
-  do {  /* for each name */
-    TString *vname = str_checkname(ls);
-    lu_byte kind = getglobalattribute(ls, defkind);
-    lastidx = new_varkind(ls, vname, kind);
-    nvars++;
-  } while (testnext(ls, ','));
-  if (testnext(ls, '='))  /* initialization? */
-    initglobal(ls, nvars, lastidx - nvars + 1, 0, ls->linenumber);
-  fs->nactvar = cast_short(fs->nactvar + nvars);  /* activate declaration */
-}
-
-
-static void globalstat (LexState *ls) {
-  /* globalstat -> (GLOBAL) attrib '*'
-     globalstat -> (GLOBAL) attrib NAME attrib {',' NAME attrib} */
-  FuncState *fs = ls->fs;
-  /* get prefixed attribute (if any); default is regular global variable */
-  lu_byte defkind = getglobalattribute(ls, GDKREG);
-  if (!testnext(ls, '*'))
-    globalnames(ls, defkind);
-  else {
-    /* use NULL as name to represent '*' entries */
-    new_varkind(ls, NULL, defkind);
-    fs->nactvar++;  /* activate declaration */
-  }
-}
-
-
-static void globalfunc (LexState *ls, int line) {
-  /* globalfunc -> (GLOBAL FUNCTION) NAME body */
-  expdesc var, b;
-  FuncState *fs = ls->fs;
-  TString *fname = str_checkname(ls);
-  new_varkind(ls, fname, GDKREG);  /* declare global variable */
-  fs->nactvar++;  /* enter its scope */
-  buildglobal(ls, fname, &var);
-  body(ls, &b, 0, ls->linenumber);  /* compile and return closure in 'b' */
-  checkglobal(ls, fname, line);
-  lauK_storevar(fs, &var, &b);
-  lauK_fixline(fs, line);  /* definition "happens" in the first line */
-}
-
-
-static void globalstatfunc (LexState *ls, int line) {
-  /* stat -> GLOBAL globalfunc | GLOBAL globalstat */
-  lauX_next(ls);  /* skip 'global' */
-  if (testnext(ls, TK_FUNCTION))
-    globalfunc(ls, line);
-  else
-    globalstat(ls);
 }
 
 
@@ -2100,15 +1960,6 @@ static void statement (LexState *ls) {
         localstat(ls);
       break;
     }
-    case TK_GLOBAL: {  /* stat -> globalstatfunc */
-      globalstatfunc(ls, line);
-      break;
-    }
-    case TK_DBCOLON: {  /* stat -> label */
-      lauX_next(ls);  /* skip double colon */
-      labelstat(ls, str_checkname(ls), line);
-      break;
-    }
     case TK_RETURN: {  /* stat -> retstat */
       lauX_next(ls);  /* skip RETURN */
       retstat(ls);
@@ -2118,26 +1969,6 @@ static void statement (LexState *ls) {
       breakstat(ls, line);
       break;
     }
-    case TK_GOTO: {  /* stat -> 'goto' NAME */
-      lauX_next(ls);  /* skip 'goto' */
-      gotostat(ls, line);
-      break;
-    }
-#if LAU_COMPAT_GLOBAL
-    case TK_NAME: {
-      /* compatibility code to parse global keyword when "global"
-         is not reserved */
-      if (ls->t.seminfo.ts == ls->glbn) {  /* current = "global"? */
-        int lk = lauX_lookahead(ls);
-        if (lk == '<' || lk == TK_NAME || lk == '*' || lk == TK_FUNCTION) {
-          /* 'global <attrib>' or 'global name' or 'global *' or
-             'global function' */
-          globalstatfunc(ls, line);
-          break;
-        }
-      }  /* else... */
-    }
-#endif
     /* FALLTHROUGH */
     default: {  /* stat -> func | assignment */
       exprstat(ls);

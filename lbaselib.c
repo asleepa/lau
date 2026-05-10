@@ -298,30 +298,6 @@ static int lauB_pairs (lau_State *L) {
 }
 
 
-/*
-** Traversal function for 'ipairs'
-*/
-static int ipairsaux (lau_State *L) {
-  lau_Integer i = lauL_checkinteger(L, 2);
-  i = lauL_intop(+, i, 1);
-  lau_pushinteger(L, i);
-  return (lau_geti(L, 1, i) == LAU_TNIL) ? 1 : 2;
-}
-
-
-/*
-** 'ipairs' function. Returns 'ipairsaux', given "table", 0.
-** (The given "table" may not be a table.)
-*/
-static int lauB_ipairs (lau_State *L) {
-  lauL_checkany(L, 1);
-  lau_pushcfunction(L, ipairsaux);  /* iteration function */
-  lau_pushvalue(L, 1);  /* state */
-  lau_pushinteger(L, 0);  /* initial value */
-  return 3;
-}
-
-
 static int load_aux (lau_State *L, int status, int envidx) {
   if (l_likely(status == LAU_OK)) {
     if (envidx != 0) {  /* 'env' parameter? */
@@ -512,11 +488,10 @@ static const lauL_Reg base_funcs[] = {
   {"dofile", lauB_dofile},
   {"error", lauB_error},
   {"getmetatable", lauB_getmetatable},
-  {"ipairs", lauB_ipairs},
   {"loadfile", lauB_loadfile},
   {"load", lauB_load},
   {"next", lauB_next},
-  {"pairs", lauB_pairs},
+  {"inpairs", lauB_pairs},
   {"pcall", lauB_pcall},
   {"print", lauB_print},
   {"warn", lauB_warn},
