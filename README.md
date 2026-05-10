@@ -25,17 +25,19 @@ If there were any issues during the installation process, please submit an [issu
 
 ## Known Issues
 - Concatenation being incorrect in some areas
-  <br>1 + "1" + "1" results in 111 instead of 3,
-  <br>1 + "a" + "b" results in a1b instead of 1ab. Temporary fix: `varol x = 1 print(x + "a" + "b")`
+  <br>1 + "1" + "1" results in 111 instead of 3.
+- Print/printn doesn't work with emojis.
 
 ## Changes
 - Added concatenation alongside pre-existing int & float addition to op_arithI (immediate operands) and op_arithf_aux (auxiliary function for floats and others; we include string concatenation here because op_arith_aux first checks if both sides of the operation are integers and otherwise calls this instead). Other arithmetic operation functions such as op_arithK (K operands) do not need changed as they point to op_arith_aux -> op_arithf_aux.
+- Added printn (semantically equivalent to print)
 - Changed local → varol
 - Changed function → func
 - Changed require → req
 - Changed nil → null
 - Changed pairs → inpairs
 - Disabled requirement for "in" keyword in for loops (forstat/forlist)
+- Disabled order flip of operands in lcode.c -> codearith when the first operand is a numeric constant to fix the order of string and numeric concatenation
 - Removed global
 - Removed goto
 - Removed ipairs

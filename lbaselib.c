@@ -494,6 +494,7 @@ static const lauL_Reg base_funcs[] = {
   {"inpairs", lauB_pairs},
   {"pcall", lauB_pcall},
   {"print", lauB_print},
+  {"printn", lauB_print},
   {"warn", lauB_warn},
   {"rawequal", lauB_rawequal},
   {"rawlen", lauB_rawlen},

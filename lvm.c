@@ -970,7 +970,6 @@ void lauV_finishOp (lau_State *L) {
     setobjs2s(L, ira, L->top.p - 1);  \
     L->top.p--;  \
     updatetrap(ci);  \
-    checkGC(L, ira);  \
     pc++;  \
   }}
 
@@ -1000,7 +999,6 @@ void lauV_finishOp (lau_State *L) {
     setobjs2s(L, ra, L->top.p - 1);  \
     L->top.p--;  \
     updatetrap(ci);  \
-    checkGC(L, ra);  \
     pc++;  \
   }}
 

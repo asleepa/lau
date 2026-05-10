@@ -1604,15 +1604,10 @@ static void codeconcat (FuncState *fs, expdesc *e1, expdesc *e2, int line) {
 */
 static void codecommutative (FuncState *fs, BinOpr op,
                              expdesc *e1, expdesc *e2, int line) {
-  int flip = 0;
-  if (tonumeral(e1, NULL)) {  /* is first operand a numeric constant? */
-    swapexps(e1, e2);  /* change order */
-    flip = 1;
-  };
   if (op == OPR_ADD && isSCint(e2))  /* immediate operand? */
-    codebini(fs, OP_ADDI, e1, e2, flip, line, TM_ADD);
+    codebini(fs, OP_ADDI, e1, e2, 0, line, TM_ADD);
   else
-    codearith(fs, op, e1, e2, flip, line);
+    codearith(fs, op, e1, e2, 0, line);
 }
 
 

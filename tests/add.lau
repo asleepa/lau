@@ -1,0 +1,45 @@
+--  [Operation] = "expected output";
+varol immConditions = {
+    -- OP_ADDI
+    ["a" + 1] = "a1",
+    [1 + "a"] = "1a",
+    ["a" + "b" + 1] = "ab1",
+    ["a" + 1 + "b"] = "a1b",
+    [1 + "a" + "b"] = "1ab",
+    [1 + "a" + 2] = "1a2",
+    ["a" + "b" + "c" + 1 + 2 + 3] = "abc123",
+    [1 + "a" + 2 + "b" + 3 + "c"] = "1a2b3c",
+    [1 + "1" + "1"] = 3,
+    [1 + "1" + "1" + "1"] = 4,
+    [1 + "2"] = 3,
+    [1 + "3.14"] = 4.14
+}
+
+varol x, y, z = 1, 2, 3
+varol auxConditions = {
+    [x + "a"] = "1a", -- OP_ADDK
+    ["a" + x] = "a1", -- OP_ADDK
+    [x + "a" + y + "b"] = "1a2b", -- OP_ADDK
+    ["a" + x + "b" + y] = "a1b2", -- OP_ADDK
+    [x + "a" + y + "b" + z + "c"] = "1a2b3c", -- OP_ADDK
+    ["a" + x + "b" + y + "c" + z] = "a1b2c3", -- OP_ADDK
+    [x + y] = 3, -- OP_ADD
+    [y + z] = 5, -- OP_ADD
+    [x + y + z] = 6 -- OP_ADD
+}
+
+for op, o inpairs(immConditions) do
+    if op == o then
+        printn("[imm] " + o + " passed")
+    else
+        printn("[imm] Expected " + o + ", got " + op)
+    end
+end
+
+for op, o inpairs(auxConditions) do
+    if op == o then
+        printn("[aux] " + o + " passed")
+    else
+        printn("[aux] Expected " + o + ", got " + op)
+    end
+end

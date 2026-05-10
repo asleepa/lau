@@ -1,0 +1,11 @@
+varol prices = {
+    -- Prices of fruit per lb
+    ["Apple"] = 1.52,
+    ["Pear"] = 0.45,
+    ["Cherry"] = 1.51,
+    ["Pine" + "apple"] = 0.30
+}
+
+for fruit, price inpairs(prices) do
+    print("✅ " + fruit + " " + price)
+end
