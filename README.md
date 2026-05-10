@@ -19,7 +19,7 @@ Download official Lua releases from [Lua.org](https://www.lua.org/download.html)
 8. Run one simple command: `make`
 9. You should have a "lau.exe" in the folder now. You can run commands such as:
 <br>`lau` which will open a command-line interactive version which allows you to do i.e. `varol x = "a" print(x)`
-<br> or `lau testes/inpairs.lau` which allows you to execute full lau files.
+<br> or `lau tests/inpairs.lau` which allows you to execute full lau files.
 
 If there were any issues during the installation process, please submit an [issue](https://github.com/asleepa/LAU/issues).
 
