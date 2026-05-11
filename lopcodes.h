@@ -267,13 +267,6 @@ OP_MODK,/*	A B C	R[A] := R[B] % K[C]:number			*/
 OP_POWK,/*	A B C	R[A] := R[B] ^ K[C]:number			*/
 OP_DIVK,/*	A B C	R[A] := R[B] / K[C]:number			*/
 
-OP_BANDK,/*	A B C	R[A] := R[B] & K[C]:integer			*/
-OP_BORK,/*	A B C	R[A] := R[B] | K[C]:integer			*/
-OP_BXORK,/*	A B C	R[A] := R[B] ~ K[C]:integer			*/
-
-OP_SHLI,/*	A B sC	R[A] := sC << R[B]				*/
-OP_SHRI,/*	A B sC	R[A] := R[B] >> sC				*/
-
 OP_ADD,/*	A B C	R[A] := R[B] + R[C]				*/
 OP_SUB,/*	A B C	R[A] := R[B] - R[C]				*/
 OP_MUL,/*	A B C	R[A] := R[B] * R[C]				*/
@@ -281,22 +274,12 @@ OP_MOD,/*	A B C	R[A] := R[B] % R[C]				*/
 OP_POW,/*	A B C	R[A] := R[B] ^ R[C]				*/
 OP_DIV,/*	A B C	R[A] := R[B] / R[C]				*/
 
-OP_BAND,/*	A B C	R[A] := R[B] & R[C]				*/
-OP_BOR,/*	A B C	R[A] := R[B] | R[C]				*/
-OP_BXOR,/*	A B C	R[A] := R[B] ~ R[C]				*/
-OP_SHL,/*	A B C	R[A] := R[B] << R[C]				*/
-OP_SHR,/*	A B C	R[A] := R[B] >> R[C]				*/
-
 OP_MMBIN,/*	A B C	call C metamethod over R[A] and R[B]		*/
 OP_MMBINI,/*	A sB C k	call C metamethod over R[A] and sB	*/
 OP_MMBINK,/*	A B C k		call C metamethod over R[A] and K[B]	*/
 
-OP_UNM,/*	A B	R[A] := -R[B]					*/
-OP_BNOT,/*	A B	R[A] := ~R[B]					*/
 OP_NOT,/*	A B	R[A] := not R[B]				*/
 OP_LEN,/*	A B	R[A] := #R[B] (length operator)			*/
-
-OP_CONCAT,/*	A B	R[A] := R[A].. ... ..R[A + B - 1]		*/
 
 OP_CLOSE,/*	A	close all upvalues >= R[A]			*/
 OP_TBC,/*	A	mark variable A "to be closed"			*/

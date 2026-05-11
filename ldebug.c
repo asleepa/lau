@@ -636,10 +636,7 @@ static const char *funcnamefromcode (lau_State *L, const Proto *p,
       tm = cast(TMS, GETARG_C(i));
       break;
     }
-    case OP_UNM: tm = TM_UNM; break;
-    case OP_BNOT: tm = TM_BNOT; break;
     case OP_LEN: tm = TM_LEN; break;
-    case OP_CONCAT: tm = TM_CONCAT; break;
     case OP_EQ: tm = TM_EQ; break;
     /* no cases for OP_EQI and OP_EQK, as they don't call metamethods */
     case OP_LT: case OP_LTI: case OP_GTI: tm = TM_LT; break;

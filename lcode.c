@@ -1381,14 +1381,8 @@ void lauK_indexed (FuncState *fs, expdesc *t, expdesc *k) {
 ** Bitwise operations need operands convertible to integers; division
 ** operations cannot have 0 as divisor.
 */
-static int validop (int op, TValue *v1, TValue *v2) {
+static int validop (int op, TValue *v2) {
   switch (op) {
-    case LAU_OPBAND: case LAU_OPBOR: case LAU_OPBXOR:
-    case LAU_OPSHL: case LAU_OPSHR: case LAU_OPBNOT: {  /* conversion errors */
-      lau_Integer i;
-      return (lauV_tointegerns(v1, &i, LAU_FLOORN2I) &&
-              lauV_tointegerns(v2, &i, LAU_FLOORN2I));
-    }
     case LAU_OPDIV: case LAU_OPMOD:  /* division by 0 */
       return (nvalue(v2) != 0);
     default: return 1;  /* everything else is valid */
@@ -1403,7 +1397,7 @@ static int validop (int op, TValue *v1, TValue *v2) {
 static int constfolding (FuncState *fs, int op, expdesc *e1,
                                         const expdesc *e2) {
   TValue v1, v2, res;
-  if (!tonumeral(e1, &v1) || !tonumeral(e2, &v2) || !validop(op, &v1, &v2))
+  if (!tonumeral(e1, &v1) || !tonumeral(e2, &v2) || !validop(op, &v2))
     return 0;  /* non-numeric operands or not safe to fold */
   lauO_rawarith(fs->ls->L, op, &v1, &v2, &res);  /* does operation */
   if (ttisinteger(&res)) {
@@ -1426,7 +1420,7 @@ static int constfolding (FuncState *fs, int op, expdesc *e1,
 */
 l_sinline OpCode binopr2op (BinOpr opr, BinOpr baser, OpCode base) {
   lau_assert(baser <= opr &&
-            ((baser == OPR_ADD && opr <= OPR_SHR) ||
+            ((baser == OPR_ADD && opr <= OPR_DIV) ||
              (baser == OPR_LT && opr <= OPR_LE)));
   return cast(OpCode, (cast_int(opr) - cast_int(baser)) + cast_int(base));
 }
@@ -1437,7 +1431,7 @@ l_sinline OpCode binopr2op (BinOpr opr, BinOpr baser, OpCode base) {
 */
 l_sinline OpCode unopr2op (UnOpr opr) {
   return cast(OpCode, (cast_int(opr) - cast_int(OPR_MINUS)) +
-                                       cast_int(OP_UNM));
+                                       cast_int(OP_NOT));
 }
 
 
@@ -1445,7 +1439,7 @@ l_sinline OpCode unopr2op (UnOpr opr) {
 ** Convert a BinOpr to a tag method  (ORDER OPR - ORDER TM)
 */
 l_sinline TMS binopr2TM (BinOpr opr) {
-  lau_assert(OPR_ADD <= opr && opr <= OPR_SHR);
+  lau_assert(OPR_ADD <= opr && opr <= OPR_DIV);
   return cast(TMS, (cast_int(opr) - cast_int(OPR_ADD)) + cast_int(TM_ADD));
 }
 
@@ -1495,7 +1489,7 @@ static void codebinexpval (FuncState *fs, BinOpr opr,
   /* 'e1' must be already in a register or it is a constant */
   lau_assert((VNIL <= e1->k && e1->k <= VKSTR) ||
              e1->k == VNONRELOC || e1->k == VRELOC);
-  lau_assert(OP_ADD <= op && op <= OP_SHR);
+  lau_assert(OP_ADD <= op && op <= OP_DIV);
   finishbinexpval(fs, e1, e2, op, v2, 0, line, OP_MMBIN, binopr2TM(opr));
 }
 
@@ -1576,28 +1570,6 @@ static void codearith (FuncState *fs, BinOpr opr,
 
 
 /*
-** Create code for '(e1 .. e2)'.
-** For '(e1 .. e2.1 .. e2.2)' (which is '(e1 .. (e2.1 .. e2.2))',
-** because concatenation is right associative), merge both CONCATs.
-*/
-static void codeconcat (FuncState *fs, expdesc *e1, expdesc *e2, int line) {
-  Instruction *ie2 = previousinstruction(fs);
-  if (GET_OPCODE(*ie2) == OP_CONCAT) {  /* is 'e2' a concatenation? */
-    int n = GETARG_B(*ie2);  /* # of elements concatenated in 'e2' */
-    lau_assert(e1->u.info + 1 == GETARG_A(*ie2));
-    freeexp(fs, e2);
-    SETARG_A(*ie2, e1->u.info);  /* correct first element ('e1') */
-    SETARG_B(*ie2, n + 1);  /* will concatenate one more element */
-  }
-  else {  /* 'e2' is not a concatenation */
-    lauK_codeABC(fs, OP_CONCAT, e1->u.info, 2, 0);  /* new concat opcode */
-    freeexp(fs, e2);
-    lauK_fixline(fs, line);
-  }
-}
-
-
-/*
 ** Code commutative operators ('+', '*'). If first operand is a
 ** numeric constant, change order of operands to try to use an
 ** immediate or K operator.
@@ -1608,24 +1580,6 @@ static void codecommutative (FuncState *fs, BinOpr op,
     codebini(fs, OP_ADDI, e1, e2, 0, line, TM_ADD);
   else
     codearith(fs, op, e1, e2, 0, line);
-}
-
-
-/*
-** Code bitwise operations; they are all commutative, so the function
-** tries to put an integer constant as the 2nd operand (a K operand).
-*/
-static void codebitwise (FuncState *fs, BinOpr opr,
-                         expdesc *e1, expdesc *e2, int line) {
-  int flip = 0;
-  if (e1->k == VKINT) {
-    swapexps(e1, e2);  /* 'e2' will be the constant operand */
-    flip = 1;
-  }
-  if (e2->k == VKINT && lauK_exp2K(fs, e2))  /* K operand? */
-    codebinK(fs, opr, e1, e2, flip, line);
-  else  /* no constants */
-    codebinNoK(fs, opr, e1, e2, flip, line);
 }
 
 
@@ -1700,8 +1654,8 @@ void lauK_prefix (FuncState *fs, UnOpr opr, expdesc *e, int line) {
   static const expdesc ef = {VKINT, {0}, NO_JUMP, NO_JUMP};
   lauK_dischargevars(fs, e);
   switch (opr) {
-    case OPR_MINUS: case OPR_BNOT:  /* use 'ef' as fake 2nd operand */
-      if (constfolding(fs, cast_int(opr + LAU_OPUNM), e, &ef))
+    case OPR_MINUS:  /* use 'ef' as fake 2nd operand */
+      if (constfolding(fs, cast_int(opr + LAU_OPDIV), e, &ef))
         break;
       /* else */ /* FALLTHROUGH */
     case OPR_LEN:
@@ -1728,15 +1682,10 @@ void lauK_infix (FuncState *fs, BinOpr op, expdesc *v) {
       lauK_goiffalse(fs, v);  /* go ahead only if 'v' is false */
       break;
     }
-    case OPR_CONCAT: {
-      lauK_exp2nextreg(fs, v);  /* operand must be on the stack */
-      break;
-    }
     case OPR_ADD: case OPR_SUB:
     case OPR_MUL: case OPR_DIV:
     case OPR_MOD: case OPR_POW:
-    case OPR_BAND: case OPR_BOR: case OPR_BXOR:
-    case OPR_SHL: case OPR_SHR: {
+    {
       if (!tonumeral(v, NULL))
         lauK_exp2anyreg(fs, v);
       /* else keep numeral, which may be folded or used as an immediate
@@ -1794,29 +1743,6 @@ void lauK_posfix (FuncState *fs, BinOpr opr,
     }  /* FALLTHROUGH */
     case OPR_DIV: case OPR_MOD: case OPR_POW: {
       codearith(fs, opr, e1, e2, 0, line);
-      break;
-    }
-    case OPR_BAND: case OPR_BOR: case OPR_BXOR: {
-      codebitwise(fs, opr, e1, e2, line);
-      break;
-    }
-    case OPR_SHL: {
-      if (isSCint(e1)) {
-        swapexps(e1, e2);
-        codebini(fs, OP_SHLI, e1, e2, 1, line, TM_SHL);  /* I << r2 */
-      }
-      else if (finishbinexpneg(fs, e1, e2, OP_SHRI, line, TM_SHL)) {
-        /* coded as (r1 >> -I) */;
-      }
-      else  /* regular case (two registers) */
-       codebinexpval(fs, opr, e1, e2, line);
-      break;
-    }
-    case OPR_SHR: {
-      if (isSCint(e2))
-        codebini(fs, OP_SHRI, e1, e2, 0, line, TM_SHR);  /* r1 >> I */
-      else  /* regular case (two registers) */
-        codebinexpval(fs, opr, e1, e2, line);
       break;
     }
     case OPR_EQ: case OPR_NE: {

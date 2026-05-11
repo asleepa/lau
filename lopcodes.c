@@ -49,30 +49,17 @@ LAUI_DDEF const lu_byte lauP_opmodes[NUM_OPCODES] = {
  ,opmode(0, 0, 0, 0, 1, iABC)		/* OP_MODK */
  ,opmode(0, 0, 0, 0, 1, iABC)		/* OP_POWK */
  ,opmode(0, 0, 0, 0, 1, iABC)		/* OP_DIVK */
- ,opmode(0, 0, 0, 0, 1, iABC)		/* OP_BANDK */
- ,opmode(0, 0, 0, 0, 1, iABC)		/* OP_BORK */
- ,opmode(0, 0, 0, 0, 1, iABC)		/* OP_BXORK */
- ,opmode(0, 0, 0, 0, 1, iABC)		/* OP_SHLI */
- ,opmode(0, 0, 0, 0, 1, iABC)		/* OP_SHRI */
  ,opmode(0, 0, 0, 0, 1, iABC)		/* OP_ADD */
  ,opmode(0, 0, 0, 0, 1, iABC)		/* OP_SUB */
  ,opmode(0, 0, 0, 0, 1, iABC)		/* OP_MUL */
  ,opmode(0, 0, 0, 0, 1, iABC)		/* OP_MOD */
  ,opmode(0, 0, 0, 0, 1, iABC)		/* OP_POW */
  ,opmode(0, 0, 0, 0, 1, iABC)		/* OP_DIV */
- ,opmode(0, 0, 0, 0, 1, iABC)		/* OP_BAND */
- ,opmode(0, 0, 0, 0, 1, iABC)		/* OP_BOR */
- ,opmode(0, 0, 0, 0, 1, iABC)		/* OP_BXOR */
- ,opmode(0, 0, 0, 0, 1, iABC)		/* OP_SHL */
- ,opmode(0, 0, 0, 0, 1, iABC)		/* OP_SHR */
  ,opmode(1, 0, 0, 0, 0, iABC)		/* OP_MMBIN */
  ,opmode(1, 0, 0, 0, 0, iABC)		/* OP_MMBINI */
  ,opmode(1, 0, 0, 0, 0, iABC)		/* OP_MMBINK */
- ,opmode(0, 0, 0, 0, 1, iABC)		/* OP_UNM */
- ,opmode(0, 0, 0, 0, 1, iABC)		/* OP_BNOT */
  ,opmode(0, 0, 0, 0, 1, iABC)		/* OP_NOT */
  ,opmode(0, 0, 0, 0, 1, iABC)		/* OP_LEN */
- ,opmode(0, 0, 0, 0, 1, iABC)		/* OP_CONCAT */
  ,opmode(0, 0, 0, 0, 0, iABC)		/* OP_CLOSE */
  ,opmode(0, 0, 0, 0, 0, iABC)		/* OP_TBC */
  ,opmode(0, 0, 0, 0, 0, isJ)		/* OP_JMP */

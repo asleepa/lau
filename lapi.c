@@ -332,13 +332,7 @@ LAU_API int lau_rawequal (lau_State *L, int index1, int index2) {
 
 LAU_API void lau_arith (lau_State *L, int op) {
   lau_lock(L);
-  if (op != LAU_OPUNM && op != LAU_OPBNOT)
-    api_checkpop(L, 2);  /* all other operations expect two operands */
-  else {  /* for unary operations, add fake 2nd operand */
-    api_checkpop(L, 1);
-    setobjs2s(L, L->top.p, L->top.p - 1);
-    api_incr_top(L);
-  }
+  api_checkpop(L, 2);
   /* first operand at top - 2, second at top - 1; result go to top - 2 */
   lauO_arith(L, op, s2v(L->top.p - 2), s2v(L->top.p - 1), L->top.p - 2);
   L->top.p--;  /* pop second operand */

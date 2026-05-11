@@ -791,21 +791,6 @@ lau_Number lauV_modf (lau_State *L, lau_Number m, lau_Number n) {
 
 
 /*
-** Shift left operation. (Shift right just negates 'y'.)
-*/
-lau_Integer lauV_shiftl (lau_Integer x, lau_Integer y) {
-  if (y < 0) {  /* shift right? */
-    if (y <= -NBITS) return 0;
-    else return intop(>>, x, -y);
-  }
-  else {  /* shift left */
-    if (y >= NBITS) return 0;
-    else return intop(<<, x, y);
-  }
-}
-
-
-/*
 ** create a new Lau closure, push it in the stack, and initialize
 ** its upvalues.
 */
@@ -840,7 +825,7 @@ void lauV_finishOp (lau_State *L) {
       setobjs2s(L, base + GETARG_A(*(ci->u.l.savedpc - 2)), --L->top.p);
       break;
     }
-    case OP_UNM: case OP_BNOT: case OP_LEN:
+    case OP_LEN:
     case OP_GETTABUP: case OP_GETTABLE: case OP_GETI:
     case OP_GETFIELD: case OP_SELF: {
       setobjs2s(L, base + GETARG_A(inst), --L->top.p);
@@ -855,15 +840,6 @@ void lauV_finishOp (lau_State *L) {
       lau_assert(GET_OPCODE(*ci->u.l.savedpc) == OP_JMP);
       if (res != GETARG_k(inst))  /* condition failed? */
         ci->u.l.savedpc++;  /* skip jump instruction */
-      break;
-    }
-    case OP_CONCAT: {
-      StkId top = L->top.p - 1;  /* top when 'lauT_tryconcatTM' was called */
-      int a = GETARG_A(inst);      /* first element to concatenate */
-      int total = cast_int(top - 1 - (base + a));  /* yet to concatenate */
-      setobjs2s(L, top - 2, top);  /* put TM result in proper position */
-      L->top.p = top - 1;  /* top is one after last element (at top-2) */
-      lauV_concat(L, total);  /* concat them (may yield again) */
       break;
     }
     case OP_CLOSE: {  /* yielded closing variables */
@@ -905,9 +881,6 @@ void lauV_finishOp (lau_State *L) {
 #define l_addi(L,a,b)	intop(+, a, b)
 #define l_subi(L,a,b)	intop(-, a, b)
 #define l_muli(L,a,b)	intop(*, a, b)
-#define l_band(a,b)	intop(&, a, b)
-#define l_bor(a,b)	intop(|, a, b)
-#define l_bxor(a,b)	intop(^, a, b)
 
 #define l_lti(a,b)	(a < b)
 #define l_lei(a,b)	(a <= b)
@@ -1471,38 +1444,6 @@ void lauV_execute (lau_State *L, CallInfo *ci) {
         op_arithfK(L, laui_numdiv);
         vmbreak;
       }
-      vmcase(OP_BANDK) {
-        op_bitwiseK(L, l_band);
-        vmbreak;
-      }
-      vmcase(OP_BORK) {
-        op_bitwiseK(L, l_bor);
-        vmbreak;
-      }
-      vmcase(OP_BXORK) {
-        op_bitwiseK(L, l_bxor);
-        vmbreak;
-      }
-      vmcase(OP_SHLI) {
-        StkId ra = RA(i);
-        TValue *rb = vRB(i);
-        int ic = GETARG_sC(i);
-        lau_Integer ib;
-        if (tointegerns(rb, &ib)) {
-          pc++; setivalue(s2v(ra), lauV_shiftl(ic, ib));
-        }
-        vmbreak;
-      }
-      vmcase(OP_SHRI) {
-        StkId ra = RA(i);
-        TValue *rb = vRB(i);
-        int ic = GETARG_sC(i);
-        lau_Integer ib;
-        if (tointegerns(rb, &ib)) {
-          pc++; setivalue(s2v(ra), lauV_shiftl(ib, -ic));
-        }
-        vmbreak;
-      }
       vmcase(OP_ADD) {
         op_arith(L, l_addi, laui_numadd);
         vmbreak;
@@ -1528,33 +1469,13 @@ void lauV_execute (lau_State *L, CallInfo *ci) {
         op_arithf(L, laui_numdiv);
         vmbreak;
       }
-      vmcase(OP_BAND) {
-        op_bitwise(L, l_band);
-        vmbreak;
-      }
-      vmcase(OP_BOR) {
-        op_bitwise(L, l_bor);
-        vmbreak;
-      }
-      vmcase(OP_BXOR) {
-        op_bitwise(L, l_bxor);
-        vmbreak;
-      }
-      vmcase(OP_SHL) {
-        op_bitwise(L, lauV_shiftl);
-        vmbreak;
-      }
-      vmcase(OP_SHR) {
-        op_bitwise(L, lauV_shiftr);
-        vmbreak;
-      }
       vmcase(OP_MMBIN) {
         StkId ra = RA(i);
         Instruction pi = *(pc - 2);  /* original arith. expression */
         TValue *rb = vRB(i);
         TMS tm = (TMS)GETARG_C(i);
         StkId result = RA(pi);
-        lau_assert(OP_ADD <= GET_OPCODE(pi) && GET_OPCODE(pi) <= OP_SHR);
+        lau_assert(OP_ADD <= GET_OPCODE(pi) && GET_OPCODE(pi) <= OP_DIV);
         Protect(lauT_trybinTM(L, s2v(ra), rb, result, tm));
         vmbreak;
       }
@@ -1578,32 +1499,6 @@ void lauV_execute (lau_State *L, CallInfo *ci) {
         Protect(lauT_trybinassocTM(L, s2v(ra), imm, flip, result, tm));
         vmbreak;
       }
-      vmcase(OP_UNM) {
-        StkId ra = RA(i);
-        TValue *rb = vRB(i);
-        lau_Number nb;
-        if (ttisinteger(rb)) {
-          lau_Integer ib = ivalue(rb);
-          setivalue(s2v(ra), intop(-, 0, ib));
-        }
-        else if (tonumberns(rb, nb)) {
-          setfltvalue(s2v(ra), laui_numunm(L, nb));
-        }
-        else
-          Protect(lauT_trybinTM(L, rb, rb, ra, TM_UNM));
-        vmbreak;
-      }
-      vmcase(OP_BNOT) {
-        StkId ra = RA(i);
-        TValue *rb = vRB(i);
-        lau_Integer ib;
-        if (tointegerns(rb, &ib)) {
-          setivalue(s2v(ra), intop(^, ~l_castS2U(0), ib));
-        }
-        else
-          Protect(lauT_trybinTM(L, rb, rb, ra, TM_BNOT));
-        vmbreak;
-      }
       vmcase(OP_NOT) {
         StkId ra = RA(i);
         TValue *rb = vRB(i);
@@ -1616,14 +1511,6 @@ void lauV_execute (lau_State *L, CallInfo *ci) {
       vmcase(OP_LEN) {
         StkId ra = RA(i);
         Protect(lauV_objlen(L, ra, vRB(i)));
-        vmbreak;
-      }
-      vmcase(OP_CONCAT) {
-        StkId ra = RA(i);
-        int n = GETARG_B(i);  /* number of elements to concatenate */
-        L->top.p = ra + n;  /* mark the end of concat operands */
-        ProtectNT(lauV_concat(L, n));
-        checkGC(L, L->top.p); /* 'lauV_concat' ensures correct top */
         vmbreak;
       }
       vmcase(OP_CLOSE) {

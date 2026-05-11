@@ -105,12 +105,6 @@ typedef enum {
 #define lauV_finishfastset(L,t,v)	lauC_barrierback(L, gcvalue(t), v)
 
 
-/*
-** Shift right is the same as shift left with a negative 'y'
-*/
-#define lauV_shiftr(x,y)	lauV_shiftl(x,intop(-, 0, y))
-
-
 
 LAUI_FUNC int lauV_equalobj (lau_State *L, const TValue *t1, const TValue *t2);
 LAUI_FUNC int lauV_lessthan (lau_State *L, const TValue *l, const TValue *r);
@@ -129,7 +123,6 @@ LAUI_FUNC void lauV_execute (lau_State *L, CallInfo *ci);
 LAUI_FUNC void lauV_concat (lau_State *L, int total);
 LAUI_FUNC lau_Integer lauV_mod (lau_State *L, lau_Integer x, lau_Integer y);
 LAUI_FUNC lau_Number lauV_modf (lau_State *L, lau_Number x, lau_Number y);
-LAUI_FUNC lau_Integer lauV_shiftl (lau_Integer x, lau_Integer y);
 LAUI_FUNC void lauV_objlen (lau_State *L, StkId ra, const TValue *rb);
 
 #endif

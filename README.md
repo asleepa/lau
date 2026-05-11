@@ -44,3 +44,4 @@ If there were any issues during the installation process, please submit an [issu
 - Removed .. (Lua concatenation)
 - Removed ... (Lua vararg)
 - Removed // (floor division)
+- Removed bitwise operators BAND (&), BOR (|), BXOR (~), SHL (<<), SHR (>>), UNM (~), AND BNOT (~)

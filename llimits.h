@@ -265,7 +265,6 @@ typedef unsigned long l_uint32;
 #define laui_numadd(L,a,b)      ((void)L, (a)+(b))
 #define laui_numsub(L,a,b)      ((void)L, (a)-(b))
 #define laui_nummul(L,a,b)      ((void)L, (a)*(b))
-#define laui_numunm(L,a)        ((void)L, -(a))
 #define laui_numeq(a,b)         ((a)==(b))
 #define laui_numlt(a,b)         ((a)<(b))
 #define laui_numle(a,b)         ((a)<=(b))

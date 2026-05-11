@@ -119,13 +119,6 @@ static lau_Integer intarith (lau_State *L, int op, lau_Integer v1,
     case LAU_OPSUB:return intop(-, v1, v2);
     case LAU_OPMUL:return intop(*, v1, v2);
     case LAU_OPMOD: return lauV_mod(L, v1, v2);
-    case LAU_OPBAND: return intop(&, v1, v2);
-    case LAU_OPBOR: return intop(|, v1, v2);
-    case LAU_OPBXOR: return intop(^, v1, v2);
-    case LAU_OPSHL: return lauV_shiftl(v1, v2);
-    case LAU_OPSHR: return lauV_shiftr(v1, v2);
-    case LAU_OPUNM: return intop(-, 0, v1);
-    case LAU_OPBNOT: return intop(^, ~l_castS2U(0), v1);
     default: lau_assert(0); return 0;
   }
 }
@@ -139,7 +132,6 @@ static lau_Number numarith (lau_State *L, int op, lau_Number v1,
     case LAU_OPMUL: return laui_nummul(L, v1, v2);
     case LAU_OPDIV: return laui_numdiv(L, v1, v2);
     case LAU_OPPOW: return laui_numpow(L, v1, v2);
-    case LAU_OPUNM: return laui_numunm(L, v1);
     case LAU_OPMOD: return lauV_modf(L, v1, v2);
     default: lau_assert(0); return 0;
   }
@@ -149,16 +141,6 @@ static lau_Number numarith (lau_State *L, int op, lau_Number v1,
 int lauO_rawarith (lau_State *L, int op, const TValue *p1, const TValue *p2,
                    TValue *res) {
   switch (op) {
-    case LAU_OPBAND: case LAU_OPBOR: case LAU_OPBXOR:
-    case LAU_OPSHL: case LAU_OPSHR:
-    case LAU_OPBNOT: {  /* operate only on integers */
-      lau_Integer i1; lau_Integer i2;
-      if (tointegerns(p1, &i1) && tointegerns(p2, &i2)) {
-        setivalue(res, intarith(L, op, i1, i2));
-        return 1;
-      }
-      else return 0;  /* fail */
-    }
     case LAU_OPDIV: case LAU_OPPOW: {  /* operate only on floats */
       lau_Number n1; lau_Number n2;
       if (tonumberns(p1, n1) && tonumberns(p2, n2)) {

@@ -41,8 +41,7 @@ void lauT_init (lau_State *L) {
     "__gc", "__mode", "__len", "__eq",
     "__add", "__sub", "__mul", "__mod", "__pow",
     "__div",
-    "__band", "__bor", "__bxor", "__shl", "__shr",
-    "__unm", "__bnot", "__lt", "__le",
+    "__lt", "__le",
     "__concat", "__call", "__close"
   };
   int i;
@@ -151,13 +150,6 @@ void lauT_trybinTM (lau_State *L, const TValue *p1, const TValue *p2,
                     StkId res, TMS event) {
   if (l_unlikely(callbinTM(L, p1, p2, res, event) < 0)) {
     switch (event) {
-      case TM_BAND: case TM_BOR: case TM_BXOR:
-      case TM_SHL: case TM_SHR: case TM_BNOT: {
-        if (ttisnumber(p1) && ttisnumber(p2))
-          lauG_tointerror(L, p1, p2);
-        else
-          lauG_opinterror(L, p1, p2, "perform bitwise operation on");
-      }
       /* calls never return, but to avoid warnings: *//* FALLTHROUGH */
       default:
         lauG_opinterror(L, p1, p2, "perform arithmetic on");
