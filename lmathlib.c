@@ -160,12 +160,6 @@ static int math_modf (lau_State *L) {
 }
 
 
-static int math_sqrt (lau_State *L) {
-  lau_pushnumber(L, l_mathop(sqrt)(lauL_checknumber(L, 1)));
-  return 1;
-}
-
-
 static int math_ult (lau_State *L) {
   lau_Integer a = lauL_checkinteger(L, 1);
   lau_Integer b = lauL_checkinteger(L, 2);
@@ -724,7 +718,6 @@ static const lauL_Reg mathlib[] = {
   {"modf",   math_modf},
   {"rad",   math_rad},
   {"sin",   math_sin},
-  {"sqrt",  math_sqrt},
   {"tan",   math_tan},
   {"type", math_type},
 #if defined(LAU_COMPAT_MATHLIB)

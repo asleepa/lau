@@ -1029,7 +1029,7 @@ static int maxtostore (FuncState *fs) {
 
 static void constructor (LexState *ls, expdesc *t) {
   /* constructor -> '{' [ field { sep field } [sep] ] '}'
-     sep -> ',' | ';' */
+     sep -> ',' */
   FuncState *fs = ls->fs;
   int line = ls->linenumber;
   int pc = lauK_codevABCk(fs, OP_NEWTABLE, 0, 0, 0, 0);
@@ -1049,7 +1049,7 @@ static void constructor (LexState *ls, expdesc *t) {
     field(ls, &cc);
     lauY_checklimit(fs, cc.tostore + cc.na + cc.nh, MAX_CNST,
                     "items in a constructor");
-  } while (testnext(ls, ',') || testnext(ls, ';'));
+  } while (testnext(ls, ','));
   check_match(ls, /*{*/ '}', '{' /*}*/, line);
   lastlistfield(fs, &cc);
   lauK_settablesize(fs, pc, t->u.info, cc.na, cc.nh);
@@ -1869,7 +1869,7 @@ static void retstat (LexState *ls) {
   expdesc e;
   int nret;  /* number of values being returned */
   int first = lauY_nvarstack(fs);  /* first slot to be returned */
-  if (block_follow(ls, 1) || ls->t.token == ';')
+  if (block_follow(ls, 1))
     nret = 0;  /* return no values */
   else {
     nret = explist(ls, &e);  /* optional return values */
@@ -1891,7 +1891,6 @@ static void retstat (LexState *ls) {
     }
   }
   lauK_ret(fs, first, nret);
-  testnext(ls, ';');  /* skip optional semicolon */
 }
 
 
@@ -1899,10 +1898,6 @@ static void statement (LexState *ls) {
   int line = ls->linenumber;  /* may be needed for error messages */
   enterlevel(ls);
   switch (ls->t.token) {
-    case ';': {  /* stat -> ';' (empty statement) */
-      lauX_next(ls);  /* skip ';' */
-      break;
-    }
     case TK_IF: {  /* stat -> ifstat */
       ifstat(ls, line);
       break;

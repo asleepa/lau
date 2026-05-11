@@ -43,9 +43,9 @@
 
 /* ORDER RESERVED */
 static const char *const lauX_tokens [] = {
-    "and", "break", "do", "else", "elseif",
+    "AND", "break", "do", "else", "elseif",
     "end", "false", "for", "func", "if",
-    "varol", "null", "not", "or", "repeat",
+    "varol", "null", "NOT", "OR", "repeat",
     "return", "then", "true", "until", "while",
     "==", ">=", "<=", "~=",
     "<eof>",

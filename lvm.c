@@ -746,6 +746,16 @@ void lauV_objlen (lau_State *L, StkId ra, const TValue *rb) {
       setivalue(s2v(ra), cast_st2S(tsvalue(rb)->u.lnglen));
       return;
     }
+    case LAU_VNUMINT: case LAU_VNUMFLT: {
+      lau_Number root = l_mathop(sqrt)(nvalue(rb));
+      lau_Integer rooti = (lau_Integer)root;
+      if (root == rooti) {
+        setivalue(s2v(ra), rooti);
+      } else {
+        setfltvalue(s2v(ra), root);
+      }
+      return;
+    }
     default: {  /* try metamethod */
       tm = lauT_gettmbyobj(L, rb, TM_LEN);
       if (l_unlikely(notm(tm)))  /* no metamethod? */

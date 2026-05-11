@@ -29,7 +29,7 @@ static int lauB_print (lau_State *L) {
     size_t l;
     const char *s = lauL_tolstring(L, i, &l);  /* convert it to string */
     if (i > 1)  /* not the first element? */
-      lau_writestring("\t", 1);  /* add a tab before it */
+      lau_writestring(" ", 1);  /* add a space before it */
     lau_writestring(s, l);  /* print it */
     lau_pop(L, 1);  /* pop result */
   }

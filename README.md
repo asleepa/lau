@@ -1,7 +1,7 @@
 # Lau
 <img width="1920" height="1032" alt="Testing LAU image" src="https://github.com/user-attachments/assets/126802fe-e135-4fca-950b-4d37c4e94621" /><br>
 
-This is the repository of Lau development code. Unlike official Lau (plant with coding), it is based on the source code of Lua's 5/9/2026 development code (5.5.1) and C. It is supposed to be as accurate as possible to the [game version Lau](https://www.roblox.com/games/122761763017872/Plant-with-Coding), however if there are any inconsistencies or bugs please feel free to submit a [pull request](https://github.com/asleepa/LAU/pulls).
+This is the repository of Lau development code. Unlike official Lau (plant with coding), it is based on the source code of Lua's 5/9/2026 development code (5.5.1) and C. It is supposed to be as accurate as possible to the [game version Lau](https://www.roblox.com/games/122761763017872/Plant-with-Coding), however if there are any inconsistencies or bugs please feel free to submit a [issue](https://github.com/asleepa/LAU/issues).
 
 Download official Lua releases from [Lua.org](https://www.lua.org/download.html).
 
@@ -29,15 +29,22 @@ If there were any issues during the installation process, please submit an [issu
 - Print/printn doesn't work with emojis.
 
 ## Changes
-- Added concatenation alongside pre-existing int & float addition to op_arithI (immediate operands) and op_arithf_aux (auxiliary function for floats and others; we include string concatenation here because op_arith_aux first checks if both sides of the operation are integers and otherwise calls this instead). Other arithmetic operation functions such as op_arithK (K operands) do not need changed as they point to op_arith_aux -> op_arithf_aux.
+- Added concatenation alongside pre-existing int & float addition to op_arithI (immediate operands) and op_arithf_aux (auxiliary function for floats and others)
+- Added square root functionality alongside OP_LEN (#)
 - Added printn (semantically equivalent to print)
+- Modified print/printn to write a space before any extra arguments instead of a tab
 - Changed local → varol
 - Changed function → func
 - Changed require → req
 - Changed nil → null
 - Changed pairs → inpairs
+- Changed and → AND
+- Changed not → NOT
+- Changed or → OR
 - Disabled requirement for "in" keyword in for loops (forstat/forlist)
 - Disabled order flip of operands in lcode.c -> codearith when the first operand is a numeric constant to fix the order of string and numeric concatenation
+- Disabled ; separation (use , instead) of table/constructor items in lparser.c -> constructor
+- Disabled ; statement termination
 - Removed global
 - Removed goto
 - Removed ipairs
@@ -45,3 +52,4 @@ If there were any issues during the installation process, please submit an [issu
 - Removed ... (Lua vararg)
 - Removed // (floor division)
 - Removed bitwise operators BAND (&), BOR (|), BXOR (~), SHL (<<), SHR (>>), UNM (~), AND BNOT (~)
+- Removed math.sqrt
