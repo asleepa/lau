@@ -1389,7 +1389,7 @@ static int validop (int op, TValue *v1, TValue *v2) {
       return (lauV_tointegerns(v1, &i, LAU_FLOORN2I) &&
               lauV_tointegerns(v2, &i, LAU_FLOORN2I));
     }
-    case LAU_OPDIV: case LAU_OPIDIV: case LAU_OPMOD:  /* division by 0 */
+    case LAU_OPDIV: case LAU_OPMOD:  /* division by 0 */
       return (nvalue(v2) != 0);
     default: return 1;  /* everything else is valid */
   }
@@ -1733,7 +1733,7 @@ void lauK_infix (FuncState *fs, BinOpr op, expdesc *v) {
       break;
     }
     case OPR_ADD: case OPR_SUB:
-    case OPR_MUL: case OPR_DIV: case OPR_IDIV:
+    case OPR_MUL: case OPR_DIV:
     case OPR_MOD: case OPR_POW:
     case OPR_BAND: case OPR_BOR: case OPR_BXOR:
     case OPR_SHL: case OPR_SHR: {
@@ -1792,7 +1792,7 @@ void lauK_posfix (FuncState *fs, BinOpr opr,
         break; /* coded as (r1 + -I) */
       /* ELSE */
     }  /* FALLTHROUGH */
-    case OPR_DIV: case OPR_IDIV: case OPR_MOD: case OPR_POW: {
+    case OPR_DIV: case OPR_MOD: case OPR_POW: {
       codearith(fs, opr, e1, e2, 0, line);
       break;
     }

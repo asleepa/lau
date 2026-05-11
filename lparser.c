@@ -1078,15 +1078,6 @@ static void parlist (LexState *ls) {
           nparams++;
           break;
         }
-        case TK_DOTS: {
-          varargk = 1;
-          lauX_next(ls);  /* skip '...' */
-          if (ls->t.token == TK_NAME)
-            new_varkind(ls, str_checkname(ls), RDKVAVAR);
-          else
-            new_localvarliteral(ls, "(vararg table)");
-          break;
-        }
         default: lauX_syntaxerror(ls, "<name> or '...' expected");
       }
     } while (!varargk && testnext(ls, ','));
@@ -1284,13 +1275,6 @@ static void simpleexp (LexState *ls, expdesc *v) {
       init_exp(v, VFALSE, 0);
       break;
     }
-    case TK_DOTS: {  /* vararg */
-      FuncState *fs = ls->fs;
-      check_condition(ls, isvararg(fs->f),
-                      "cannot use '...' outside a vararg function");
-      init_exp(v, VVARARG, lauK_codeABC(fs, OP_VARARG, 0, fs->f->numparams, 1));
-      break;
-    }
     case '{' /*}*/: {  /* constructor */
       constructor(ls, v);
       return;
@@ -1328,7 +1312,6 @@ static BinOpr getbinopr (int op) {
     case '%': return OPR_MOD;
     case '^': return OPR_POW;
     case '/': return OPR_DIV;
-    case TK_IDIV: return OPR_IDIV;
     case '&': return OPR_BAND;
     case '|': return OPR_BOR;
     case '~': return OPR_BXOR;

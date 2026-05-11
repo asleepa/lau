@@ -758,30 +758,8 @@ void lauV_objlen (lau_State *L, StkId ra, const TValue *rb) {
 
 
 /*
-** Integer division; return 'm // n', that is, floor(m/n).
-** C division truncates its result (rounds towards zero).
-** 'floor(q) == trunc(q)' when 'q >= 0' or when 'q' is integer,
-** otherwise 'floor(q) == trunc(q) - 1'.
-*/
-lau_Integer lauV_idiv (lau_State *L, lau_Integer m, lau_Integer n) {
-  if (l_unlikely(l_castS2U(n) + 1u <= 1u)) {  /* special cases: -1 or 0 */
-    if (n == 0)
-      lauG_runerror(L, "attempt to divide by zero");
-    return intop(-, 0, m);   /* n==-1; avoid overflow with 0x80000...//-1 */
-  }
-  else {
-    lau_Integer q = m / n;  /* perform C division */
-    if ((m ^ n) < 0 && m % n != 0)  /* 'm/n' would be negative non-integer? */
-      q -= 1;  /* correct result for different rounding */
-    return q;
-  }
-}
-
-
-/*
 ** Integer modulus; return 'm % n'. (Assume that C '%' with
-** negative operands follows C99 behavior. See previous comment
-** about lauV_idiv.)
+** negative operands follows C99 behavior.
 */
 lau_Integer lauV_mod (lau_State *L, lau_Integer m, lau_Integer n) {
   if (l_unlikely(l_castS2U(n) + 1u <= 1u)) {  /* special cases: -1 or 0 */
@@ -1493,11 +1471,6 @@ void lauV_execute (lau_State *L, CallInfo *ci) {
         op_arithfK(L, laui_numdiv);
         vmbreak;
       }
-      vmcase(OP_IDIVK) {
-        savestate(L, ci);  /* in case of division by 0 */
-        op_arithK(L, lauV_idiv, laui_numidiv);
-        vmbreak;
-      }
       vmcase(OP_BANDK) {
         op_bitwiseK(L, l_band);
         vmbreak;
@@ -1553,11 +1526,6 @@ void lauV_execute (lau_State *L, CallInfo *ci) {
       }
       vmcase(OP_DIV) {  /* float division (always with floats) */
         op_arithf(L, laui_numdiv);
-        vmbreak;
-      }
-      vmcase(OP_IDIV) {  /* floor division */
-        savestate(L, ci);  /* in case of division by 0 */
-        op_arith(L, lauV_idiv, laui_numidiv);
         vmbreak;
       }
       vmcase(OP_BAND) {

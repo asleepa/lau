@@ -218,7 +218,6 @@ LAU_API const void     *(lau_topointer) (lau_State *L, int idx);
 #define LAU_OPMOD	3
 #define LAU_OPPOW	4
 #define LAU_OPDIV	5
-#define LAU_OPIDIV	6
 #define LAU_OPBAND	7
 #define LAU_OPBOR	8
 #define LAU_OPBXOR	9

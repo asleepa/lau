@@ -42,3 +42,5 @@ If there were any issues during the installation process, please submit an [issu
 - Removed goto
 - Removed ipairs
 - Removed .. (Lua concatenation)
+- Removed ... (Lua vararg)
+- Removed // (floor division)

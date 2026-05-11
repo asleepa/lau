@@ -28,7 +28,6 @@ typedef enum {
   TM_MOD,
   TM_POW,
   TM_DIV,
-  TM_IDIV,
   TM_BAND,
   TM_BOR,
   TM_BXOR,

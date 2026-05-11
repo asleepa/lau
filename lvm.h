@@ -127,7 +127,6 @@ LAUI_FUNC void lauV_finishset (lau_State *L, const TValue *t, TValue *key,
 LAUI_FUNC void lauV_finishOp (lau_State *L);
 LAUI_FUNC void lauV_execute (lau_State *L, CallInfo *ci);
 LAUI_FUNC void lauV_concat (lau_State *L, int total);
-LAUI_FUNC lau_Integer lauV_idiv (lau_State *L, lau_Integer x, lau_Integer y);
 LAUI_FUNC lau_Integer lauV_mod (lau_State *L, lau_Integer x, lau_Integer y);
 LAUI_FUNC lau_Number lauV_modf (lau_State *L, lau_Number x, lau_Number y);
 LAUI_FUNC lau_Integer lauV_shiftl (lau_Integer x, lau_Integer y);

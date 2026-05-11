@@ -1606,7 +1606,6 @@ static int Cfunck (lau_State *L, int status, lau_KContext ctx);
 
 /*
 ** arithmetic operation encoding for 'arith' instruction
-** LAU_OPIDIV  -> \
 ** LAU_OPSHL   -> <
 ** LAU_OPSHR   -> >
 ** LAU_OPUNM   -> _

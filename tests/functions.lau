@@ -1,0 +1,4 @@
+func a(b, c)
+    print(b + c)
+end
+a(1, 2)

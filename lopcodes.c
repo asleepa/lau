@@ -49,7 +49,6 @@ LAUI_DDEF const lu_byte lauP_opmodes[NUM_OPCODES] = {
  ,opmode(0, 0, 0, 0, 1, iABC)		/* OP_MODK */
  ,opmode(0, 0, 0, 0, 1, iABC)		/* OP_POWK */
  ,opmode(0, 0, 0, 0, 1, iABC)		/* OP_DIVK */
- ,opmode(0, 0, 0, 0, 1, iABC)		/* OP_IDIVK */
  ,opmode(0, 0, 0, 0, 1, iABC)		/* OP_BANDK */
  ,opmode(0, 0, 0, 0, 1, iABC)		/* OP_BORK */
  ,opmode(0, 0, 0, 0, 1, iABC)		/* OP_BXORK */
@@ -61,7 +60,6 @@ LAUI_DDEF const lu_byte lauP_opmodes[NUM_OPCODES] = {
  ,opmode(0, 0, 0, 0, 1, iABC)		/* OP_MOD */
  ,opmode(0, 0, 0, 0, 1, iABC)		/* OP_POW */
  ,opmode(0, 0, 0, 0, 1, iABC)		/* OP_DIV */
- ,opmode(0, 0, 0, 0, 1, iABC)		/* OP_IDIV */
  ,opmode(0, 0, 0, 0, 1, iABC)		/* OP_BAND */
  ,opmode(0, 0, 0, 0, 1, iABC)		/* OP_BOR */
  ,opmode(0, 0, 0, 0, 1, iABC)		/* OP_BXOR */

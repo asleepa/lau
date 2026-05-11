@@ -320,10 +320,6 @@ static int arith_div (lau_State *L) {
   return arith(L, LAU_OPDIV, "__div");
 }
 
-static int arith_idiv (lau_State *L) {
-  return arith(L, LAU_OPIDIV, "__idiv");
-}
-
 static int arith_unm (lau_State *L) {
   return arith(L, LAU_OPUNM, "__unm");
 }
@@ -336,7 +332,6 @@ static const lauL_Reg stringmetamethods[] = {
   {"__mod", arith_mod},
   {"__pow", arith_pow},
   {"__div", arith_div},
-  {"__idiv", arith_idiv},
   {"__unm", arith_unm},
   {"__index", NULL},  /* placeholder */
   {NULL, NULL}

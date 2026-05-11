@@ -232,11 +232,6 @@ typedef unsigned long l_uint32;
 ** The laui_num* macros define the primitive operations over numbers.
 */
 
-/* floor division (defined as 'floor(a/b)') */
-#if !defined(laui_numidiv)
-#define laui_numidiv(L,a,b)     l_floor(laui_numdiv(L,a,b))
-#endif
-
 /* float division */
 #if !defined(laui_numdiv)
 #define laui_numdiv(L,a,b)      ((void)L, (a)/(b))

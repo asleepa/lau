@@ -119,7 +119,6 @@ static lau_Integer intarith (lau_State *L, int op, lau_Integer v1,
     case LAU_OPSUB:return intop(-, v1, v2);
     case LAU_OPMUL:return intop(*, v1, v2);
     case LAU_OPMOD: return lauV_mod(L, v1, v2);
-    case LAU_OPIDIV: return lauV_idiv(L, v1, v2);
     case LAU_OPBAND: return intop(&, v1, v2);
     case LAU_OPBOR: return intop(|, v1, v2);
     case LAU_OPBXOR: return intop(^, v1, v2);
@@ -140,7 +139,6 @@ static lau_Number numarith (lau_State *L, int op, lau_Number v1,
     case LAU_OPMUL: return laui_nummul(L, v1, v2);
     case LAU_OPDIV: return laui_numdiv(L, v1, v2);
     case LAU_OPPOW: return laui_numpow(L, v1, v2);
-    case LAU_OPIDIV: return laui_numidiv(L, v1, v2);
     case LAU_OPUNM: return laui_numunm(L, v1);
     case LAU_OPMOD: return lauV_modf(L, v1, v2);
     default: lau_assert(0); return 0;

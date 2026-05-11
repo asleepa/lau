@@ -47,7 +47,7 @@ static const char *const lauX_tokens [] = {
     "end", "false", "for", "func", "if",
     "varol", "null", "not", "or", "repeat",
     "return", "then", "true", "until", "while",
-    "//", "...", "==", ">=", "<=", "~=",
+    "==", ">=", "<=", "~=",
     "<<", ">>", "<eof>",
     "<number>", "<integer>", "<name>", "<string>"
 };
@@ -524,8 +524,7 @@ static int llex (LexState *ls, SemInfo *seminfo) {
       }
       case '/': {
         next(ls);
-        if (check_next1(ls, '/')) return TK_IDIV;  /* '//' */
-        else return '/';
+        return '/';
       }
       case '~': {
         next(ls);
@@ -542,11 +541,7 @@ static int llex (LexState *ls, SemInfo *seminfo) {
       }
       case '.': {  /* '.', '..', '...', or number */
         save_and_next(ls);
-        if (check_next1(ls, '.')) {
-          if (check_next1(ls, '.'))
-            return TK_DOTS;   /* '...' */
-        }
-        else if (!lisdigit(ls->current)) return '.';
+        if (!lisdigit(ls->current)) return '.';
         else return read_numeral(ls, seminfo);
       }
       case '0': case '1': case '2': case '3': case '4':

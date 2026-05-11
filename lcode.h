@@ -26,7 +26,7 @@
 typedef enum BinOpr {
   /* arithmetic operators */
   OPR_ADD, OPR_SUB, OPR_MUL, OPR_MOD, OPR_POW,
-  OPR_DIV, OPR_IDIV,
+  OPR_DIV,
   /* bitwise operators */
   OPR_BAND, OPR_BOR, OPR_BXOR,
   OPR_SHL, OPR_SHR,

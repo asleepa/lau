@@ -266,7 +266,6 @@ OP_MULK,/*	A B C	R[A] := R[B] * K[C]:number			*/
 OP_MODK,/*	A B C	R[A] := R[B] % K[C]:number			*/
 OP_POWK,/*	A B C	R[A] := R[B] ^ K[C]:number			*/
 OP_DIVK,/*	A B C	R[A] := R[B] / K[C]:number			*/
-OP_IDIVK,/*	A B C	R[A] := R[B] // K[C]:number			*/
 
 OP_BANDK,/*	A B C	R[A] := R[B] & K[C]:integer			*/
 OP_BORK,/*	A B C	R[A] := R[B] | K[C]:integer			*/
@@ -281,7 +280,6 @@ OP_MUL,/*	A B C	R[A] := R[B] * R[C]				*/
 OP_MOD,/*	A B C	R[A] := R[B] % R[C]				*/
 OP_POW,/*	A B C	R[A] := R[B] ^ R[C]				*/
 OP_DIV,/*	A B C	R[A] := R[B] / R[C]				*/
-OP_IDIV,/*	A B C	R[A] := R[B] // R[C]				*/
 
 OP_BAND,/*	A B C	R[A] := R[B] & R[C]				*/
 OP_BOR,/*	A B C	R[A] := R[B] | R[C]				*/
