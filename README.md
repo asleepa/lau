@@ -30,6 +30,7 @@ If there were any issues during the installation process, please submit an [issu
 
 ## Changes
 - Added concatenation alongside pre-existing int & float addition to op_arithI (immediate operands) and op_arithf_aux (auxiliary function for floats and others)
+- Added basic compound assignment operators (+=, -=, *=, /=, %=, and ^=)
 - Added square root functionality alongside OP_LEN (#)
 - Added printn (semantically equivalent to print)
 - Modified print/printn to write a space before any extra arguments instead of a tab
@@ -51,5 +52,5 @@ If there were any issues during the installation process, please submit an [issu
 - Removed .. (Lua concatenation)
 - Removed ... (Lua vararg)
 - Removed // (floor division)
-- Removed bitwise operators BAND (&), BOR (|), BXOR (~), SHL (<<), SHR (>>), UNM (~), AND BNOT (~)
+- Removed bitwise operators BAND (&), BOR (|), BXOR (\~), SHL (<<), SHR (>>), UNM (\~), AND BNOT (\~)
 - Removed math.sqrt

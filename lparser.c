@@ -1323,6 +1323,17 @@ static BinOpr getbinopr (int op) {
   }
 }
 
+static BinOpr getcompoundbinopr (int op) {
+  switch (op) {
+    case TK_ADDAS: return OPR_ADD;
+    case TK_SUBAS: return OPR_SUB;
+    case TK_MULAS: return OPR_MUL;
+    case TK_MODAS: return OPR_MOD;
+    case TK_POWAS: return OPR_POW;
+    case TK_DIVAS: return OPR_DIV;
+    default: return OPR_NOBINOPR;
+  }
+}
 
 /*
 ** Priority table for binary operators.
@@ -1503,6 +1514,32 @@ static void restassign (LexState *ls, struct LHS_assign *lh, int nvars) {
   storevartop(ls->fs, &lh->v);  /* default assignment */
 }
 
+static void dupifneeded(LexState* ls) {
+  int i = ls->fs->pc;
+  Instruction inst = i > 0 ? ls->fs->f->code[i -1] : 0;
+  int regdst, op = GET_OPCODE(inst);
+  if (i > 0 && op >= OP_GETTABUP && op <= OP_GETFIELD) {
+    regdst = ls->fs->freereg;
+    lauK_reserveregs(ls->fs, 1);
+    inst = SETARG_A(inst, regdst);
+    lauK_code(ls->fs, inst);
+  }
+}
+
+static void compoundassign(LexState *ls, struct LHS_assign *lh, int tk) {
+  expdesc e, r = lh->v;
+  BinOpr opr = getcompoundbinopr(tk);
+  check_condition(ls, vkisvar(lh->v.k), "syntax error");
+  check_readonly(ls, &lh->v);
+  checknext(ls, tk);
+  enterlevel(ls);
+  dupifneeded(ls);
+  lauK_infix(ls->fs, opr, &r);
+  expr(ls, &e);
+  lauK_posfix(ls->fs, opr, &r, &e, ls->linenumber);
+  leavelevel(ls);
+  lauK_storevar(ls->fs, &lh->v, &r);
+}
 
 static int cond (LexState *ls) {
   /* cond -> exp */
@@ -1853,6 +1890,10 @@ static void exprstat (LexState *ls) {
   if (ls->t.token == '=' || ls->t.token == ',') { /* stat -> assignment ? */
     v.prev = NULL;
     restassign(ls, &v, 1);
+  }
+  else if (ls->t.token >= TK_ADDAS && ls->t.token <= TK_POWAS) { /* stat -> compound assignment ? */
+    v.prev = NULL;
+    compoundassign(ls, &v, ls->t.token);
   }
   else {  /* stat -> func */
     Instruction *inst;

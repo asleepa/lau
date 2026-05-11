@@ -48,6 +48,7 @@ static const char *const lauX_tokens [] = {
     "varol", "null", "NOT", "OR", "repeat",
     "return", "then", "true", "until", "while",
     "==", ">=", "<=", "~=",
+    "+=", "-=", "*=", "/=", "%=", "^=",
     "<eof>",
     "<number>", "<integer>", "<name>", "<string>"
 };
@@ -478,7 +479,10 @@ static int llex (LexState *ls, SemInfo *seminfo) {
       }
       case '-': {  /* '-' or '--' (comment) */
         next(ls);
-        if (ls->current != '-') return '-';
+        if (ls->current != '-') {
+          if (check_next1(ls, '=')) return TK_SUBAS; /* '-=' */
+          else return '-';
+        }
         /* else is a comment */
         next(ls);
         if (ls->current == '[') {  /* long comment? */
@@ -522,7 +526,28 @@ static int llex (LexState *ls, SemInfo *seminfo) {
       }
       case '/': {
         next(ls);
-        return '/';
+        if (check_next1(ls, '=')) return TK_DIVAS; /* '/=' */
+        else return '/';
+      }
+      case '+': {
+        next(ls);
+        if (check_next1(ls, '=')) return TK_ADDAS; /* '+=' */
+        else return '+';
+      }
+      case '*': {
+        next(ls);
+        if (check_next1(ls, '=')) return TK_MULAS; /* '*=' */
+        else return '*';
+      }
+      case '%': {
+        next(ls);
+        if (check_next1(ls, '=')) return TK_MODAS; /* '%=' */
+        else return '%';
+      }
+      case '^': {
+        next(ls);
+        if (check_next1(ls, '=')) return TK_POWAS; /* '^=' */
+        else return '^';
       }
       case '~': {
         next(ls);
