@@ -944,10 +944,7 @@ void lauV_finishOp (lau_State *L) {
 #define op_arithf_aux(L,v1,v2,fop) {  \
   lau_Number n1; lau_Number n2;  \
   StkId ra = RA(i);  \
-  if (!ttisstring(v1) && !ttisstring(v2) && tonumberns(v1, n1) && tonumberns(v2, n2)) {  \
-    pc++; setfltvalue(s2v(ra), fop(L, n1, n2));  \
-  }  \
-  else if (tonumberns(v1, n1) && tonumberns(v2, n2)) {  \
+  if (tonumberns(v1, n1) && tonumberns(v2, n2)) {  \
     pc++; setfltvalue(s2v(ra), fop(L, n1, n2));  \
   }  \
   else if (tonumber(v1, &n1) && tonumber(v2, &n2)) {  \
