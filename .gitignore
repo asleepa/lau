@@ -17,3 +17,6 @@ lua
 
 lua.exe
 lau.exe
+
+ltests.c
+ltests.h

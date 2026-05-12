@@ -63,11 +63,6 @@ CWARNS= $(CWARNSCPP) $(CWARNSC) $(CWARNGCC)
 # -fsanitize=undefined  (you may need to add "-lubsan" to libs)
 # -fsanitize=pointer-subtract -fsanitize=address -fsanitize=pointer-compare
 
-# Test mode: Add test library, turn on asserts, redefine several
-# constants ("to give some bugs a chance"), track memory use, and add
-# debug information.
-# TESTS= -DLAU_USER_H='"ltests.h"' -Og -g
-
 LOCAL = $(TESTS) $(CWARNS)
 
 
