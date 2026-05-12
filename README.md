@@ -53,3 +53,13 @@ If there were any issues during the installation process, please submit an [issu
 - Removed // (floor division)
 - Removed bitwise operators BAND (&), BOR (|), BXOR (\~), SHL (<<), SHR (>>), UNM (\~), AND BNOT (\~)
 - Removed math.sqrt
+- Removed assert
+- Removed collectgarbage
+- Removed getmetatable & setmetatable
+- Removed dofile, loadfile, and load (will figure out alternatives later)
+- Removed next
+- Removed warn (use 'error')
+- Removed raw operational globals (rawequal, rawlen, rawget, rawest)
+- Removed select
+- Removed xpcall
+- Removed LAU_GNAME (_G) and LAU_VERSION (_VERSION)
