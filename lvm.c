@@ -911,14 +911,19 @@ void lauV_finishOp (lau_State *L) {
     lau_Integer iv1 = ivalue(v1);  \
     pc++; setivalue(ra, iop(L, iv1, imm));  \
   }  \
-  else if (tonumberns(v1, n1)) {  \
-    lau_Number fimm = cast_num(imm);  \
-    pc++; setfltvalue(ra, fop(L, n1, fimm));  \
-  }  \
   else if (ttisfloat(v1)) {  \
     lau_Number nb = fltvalue(v1);  \
     lau_Number fimm = cast_num(imm);  \
     pc++; setfltvalue(ra, fop(L, nb, fimm)); \
+  }  \
+  else if (tonumber(v1, &n1)) {  \
+    lau_Number fimm = cast_num(imm);  \
+    lau_Number result = fop(L, n1, fimm);  \
+    if (result == (lau_Integer)result) {  \
+      pc++; setivalue(ra, (lau_Integer)result);  \
+    } else {  \
+      pc++; setfltvalue(ra, result);  \
+    }  \
   }  \
   else if (ttisstring(v1)) {  \
     StkId ira = RA(i);  \
@@ -944,6 +949,14 @@ void lauV_finishOp (lau_State *L) {
   }  \
   else if (tonumberns(v1, n1) && tonumberns(v2, n2)) {  \
     pc++; setfltvalue(s2v(ra), fop(L, n1, n2));  \
+  }  \
+  else if (tonumber(v1, &n1) && tonumber(v2, &n2)) {  \
+    lau_Number result = fop(L, n1, n2);  \
+    if (result == (lau_Integer)result) {  \
+      pc++; setivalue(s2v(ra), (lau_Integer)result);  \
+    } else {  \
+      pc++; setfltvalue(s2v(ra), result);  \
+    }  \
   }  \
   else {  \
     savestate(L, ci);  \

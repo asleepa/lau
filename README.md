@@ -1,7 +1,7 @@
 # Lau
 <img width="1920" height="1032" alt="Testing LAU image" src="https://github.com/user-attachments/assets/126802fe-e135-4fca-950b-4d37c4e94621" /><br>
 
-This is the repository of Lau development code. Unlike official Lau (plant with coding), it is based on the source code of Lua's 5/9/2026 development code (5.5.1) and C. It is supposed to be as accurate as possible to the [game version Lau](https://www.roblox.com/games/122761763017872/Plant-with-Coding), however if there are any inconsistencies or bugs please feel free to submit a [issue](https://github.com/asleepa/LAU/issues).
+This is the repository of Lau development code. Unlike official Lau (plant with coding), it is based on the source code of Lua's 5/9/2026 development code (5.5.1) and C. It is supposed to be as accurate as possible to the [game version of Lau](https://www.roblox.com/games/122761763017872/Plant-with-Coding) (4.1.1), however if there are any inconsistencies or bugs please feel free to submit a [issue](https://github.com/asleepa/LAU/issues).
 
 Download official Lua releases from [Lua.org](https://www.lua.org/download.html).
 
@@ -24,8 +24,6 @@ Download official Lua releases from [Lua.org](https://www.lua.org/download.html)
 If there were any issues during the installation process, please submit an [issue](https://github.com/asleepa/LAU/issues).
 
 ## Known Issues
-- Concatenation being incorrect in some areas
-  <br>1 + "1" + "1" results in 111 instead of 3.
 - Print/printn doesn't work with emojis.
 
 ## Changes
