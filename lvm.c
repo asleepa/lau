@@ -916,15 +916,6 @@ void lauV_finishOp (lau_State *L) {
     lau_Number fimm = cast_num(imm);  \
     pc++; setfltvalue(ra, fop(L, nb, fimm)); \
   }  \
-  else if (tonumber(v1, &n1)) {  \
-    lau_Number fimm = cast_num(imm);  \
-    lau_Number result = fop(L, n1, fimm);  \
-    if (result == (lau_Integer)result) {  \
-      pc++; setivalue(ra, (lau_Integer)result);  \
-    } else {  \
-      pc++; setfltvalue(ra, result);  \
-    }  \
-  }  \
   else if (ttisstring(v1)) {  \
     StkId ira = RA(i);  \
     savestate(L, ci);  \
@@ -934,6 +925,15 @@ void lauV_finishOp (lau_State *L) {
     setobjs2s(L, ira, L->top.p - 1); L->top.p--;  \
     updatetrap(ci);  \
     pc++;  \
+  }  \
+  else if (tonumber(v1, &n1)) {  \
+    lau_Number fimm = cast_num(imm);  \
+    lau_Number result = fop(L, n1, fimm);  \
+    if (result == (lau_Integer)result) {  \
+      pc++; setivalue(ra, (lau_Integer)result);  \
+    } else {  \
+      pc++; setfltvalue(ra, result);  \
+    }  \
   }}
 
 
@@ -944,10 +944,10 @@ void lauV_finishOp (lau_State *L) {
 #define op_arithf_aux(L,v1,v2,fop) {  \
   lau_Number n1; lau_Number n2;  \
   StkId ra = RA(i);  \
-  if (tonumberns(v1, n1) && tonumberns(v2, n2)) {  \
+  if (!ttisstring(v1) && tonumberns(v1, n1) && tonumberns(v2, n2)) {  \
     pc++; setfltvalue(s2v(ra), fop(L, n1, n2));  \
   }  \
-  else if (tonumber(v1, &n1) && tonumber(v2, &n2)) {  \
+  else if (!ttisstring(v1) && tonumber(v1, &n1) && tonumber(v2, &n2)) {  \
     lau_Number result = fop(L, n1, n2);  \
     if (result == (lau_Integer)result) {  \
       pc++; setivalue(s2v(ra), (lau_Integer)result);  \
