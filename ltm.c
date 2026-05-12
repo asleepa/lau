@@ -29,8 +29,8 @@ static const char udatatypename[] = "userdata";
 
 LAUI_DDEF const char *const lauT_typenames_[LAU_TOTALTYPES] = {
   "no value",
-  "nil", "boolean", udatatypename, "number",
-  "string", "table", "function", udatatypename, "thread",
+  "null", "Boolean", udatatypename, "Number",
+  "String", "List", "Function", udatatypename, "Thread",
   "upvalue", "proto" /* these last cases are used for tests only */
 };
 

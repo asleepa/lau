@@ -940,7 +940,7 @@ LAULIB_API const char *lauL_tolstring (lau_State *L, int idx, size_t *len) {
         lau_pushstring(L, (lau_toboolean(L, idx) ? "true" : "false"));
         break;
       case LAU_TNIL:
-        lau_pushliteral(L, "nil");
+        lau_pushliteral(L, "null");
         break;
       default: {
         int tt = lauL_getmetafield(L, idx, "__name");  /* try name */

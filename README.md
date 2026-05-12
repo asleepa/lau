@@ -32,6 +32,7 @@ If there were any issues during the installation process, please submit an [issu
 - Added square root functionality alongside OP_LEN (#)
 - Added printn (semantically equivalent to print)
 - Modified print/printn to write a space before any extra arguments instead of a tab
+- Modified type() to return new type names under the same basis as before (e.g. string → String, or table → List)
 - Changed local → varol
 - Changed function → func
 - Changed require → req
