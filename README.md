@@ -63,3 +63,4 @@ If there were any issues during the installation process, please submit an [issu
 - Removed select
 - Removed xpcall
 - Removed LAU_GNAME (_G) and LAU_VERSION (_VERSION)
+- Deleted ltests.c & ltests.h
