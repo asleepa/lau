@@ -28,18 +28,27 @@ varol auxConditions = {
     [x + y + z] = 6 -- OP_ADD
 }
 
+varol passed = 0
+varol failed = {}
+
 for op, o inpairs(immConditions) do
     if op == o then
+        passed += 1
         printn("[imm] " + o + " passed")
     else
+        failed[#failed+1] = "(imm) " + o
         printn("[imm] Expected " + o + ", got " + op)
     end
 end
 
 for op, o inpairs(auxConditions) do
     if op == o then
+        passed += 1
         printn("[aux] " + o + " passed")
     else
+        failed[#failed+1] = "(aux) " + o
         printn("[aux] Expected " + o + ", got " + op)
     end
 end
+
+return passed, failed

@@ -12,6 +12,8 @@
 
 #include <limits.h>
 #include <string.h>
+#include <stdio.h>
+#include <stdbool.h>
 
 #include "lau.h"
 
@@ -28,6 +30,15 @@
 #include "lstring.h"
 #include "ltable.h"
 
+
+
+/* when there are more than one of the same key in a table, a
+   syntax error will be introduced which can be toggled through the
+   number 0/1 below, and if 0 a "last value wins" procedure
+   will be followed instead */
+#if !defined(LAU_SAMEKEY_ERR)
+#define LAU_SAMEKEY_ERR		1
+#endif
 
 
 /* maximum number of variable declarations per function (must be
@@ -919,7 +930,57 @@ typedef struct ConsControl {
   int na;  /* number of array elements already stored */
   int tostore;  /* number of array elements pending to be stored */
   int maxtostore;  /* maximum number of pending elements */
+  expdesc *keys;  /* list of keys seen */
+  int nkeys; /* number of keys */
+  int keysize; /* allocated size */
 } ConsControl;
+
+/*
+** {======================================================================
+** Constructor/Recfield Helpers
+** =======================================================================
+*/
+
+/*
+** Helper field for recfield which checks if 2 key's of
+** any types are equal to each other
+*/
+static int keyequal(expdesc *k1, expdesc *k2) {
+  if (k1->k != k2->k) return 0;
+  switch (k1->k) {
+    case VKINT:
+      return (k1->u.ival == k2->u.ival);
+    case VKFLT:
+      return (k1->u.nval == k2->u.nval);
+    case VKSTR:
+      return (k1->u.strval == k2->u.strval);
+    default:
+      return 0;
+  }
+}
+
+/*
+** Helper field for recfield which gets the key name of
+** any keys which are typed string, int, or float
+*/
+static const char* getkeyname(expdesc *key) {
+  switch (key->k) {
+    case VKSTR:
+      return getstr(key->u.strval);
+    case VKINT: {
+      static char buf[32];
+      l_sprintf(buf, sizeof(buf), "%lld", (long long)key->u.ival);
+      return buf;
+    }
+    case VKFLT: {
+      static char buf[32];
+      l_sprintf(buf, sizeof(buf), "%g", key->u.nval);
+      return buf;
+    }
+    default:
+      return "<default>";
+  }
+}
 
 
 /*
@@ -940,10 +1001,26 @@ static void recfield (LexState *ls, ConsControl *cc) {
   FuncState *fs = ls->fs;
   lu_byte reg = ls->fs->freereg;
   expdesc tab, key, val;
+  int i;
   if (ls->t.token == TK_NAME)
     codename(ls, &key);
   else  /* ls->t.token == '[' */
     yindex(ls, &key);
+  if (LAU_SAMEKEY_ERR > 0) {
+    for (i = 0; i < cc->nkeys; i++) {
+      if (keyequal(&cc->keys[i], &key))
+        lauX_syntaxerror(
+          ls,
+          lauO_pushfstring(ls->L, "this key is already defined: %s", getkeyname(&key))
+        );
+    }
+    if (cc->nkeys >= cc->keysize) {
+      int newsize = (cc->keysize == 0) ? 8 : cc->keysize * 2;
+      cc->keys = lauM_reallocvector(ls->L, cc->keys, cc->keysize, newsize, expdesc);
+      cc->keysize = newsize;
+    }
+  }
+  cc->keys[cc->nkeys++] = key;
   cc->nh++;
   checknext(ls, '=');
   tab = *cc->t;
@@ -1037,6 +1114,11 @@ static void constructor (LexState *ls, expdesc *t) {
   lauK_code(fs, 0);  /* space for extra arg. */
   cc.na = cc.nh = cc.tostore = 0;
   cc.t = t;
+  if (LAU_SAMEKEY_ERR > 0) {
+    cc.keys = NULL;
+    cc.nkeys = 0;
+    cc.keysize = 0;
+  }
   init_exp(t, VNONRELOC, fs->freereg);  /* table will be at stack top */
   lauK_reserveregs(fs, 1);
   init_exp(&cc.v, VVOID, 0);  /* no value (yet) */
@@ -1052,6 +1134,10 @@ static void constructor (LexState *ls, expdesc *t) {
   } while (testnext(ls, ','));
   check_match(ls, /*{*/ '}', '{' /*}*/, line);
   lastlistfield(fs, &cc);
+  if (LAU_SAMEKEY_ERR > 0) {
+    if (cc.keys != NULL) lauM_freearray(ls->L, cc.keys, cc.keysize);
+    lauK_setreturns(fs, t, 1);
+  }
   lauK_settablesize(fs, pc, t->u.info, cc.na, cc.nh);
 }
 
