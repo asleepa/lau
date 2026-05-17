@@ -358,15 +358,6 @@
 
 
 /*
-@@ LAU_COMPAT_MATHLIB controls the presence of several deprecated
-** functions in the mathematical library.
-** (These functions were already officially removed in 5.3;
-** nevertheless they are still available here.)
-*/
-/* #define LAU_COMPAT_MATHLIB */
-
-
-/*
 @@ The following macros supply trivial compatibility for some
 ** changes in the API. The macros themselves document how to
 ** change your code to avoid using them.
@@ -600,18 +591,6 @@
 ** non-specified way.
 */
 #define lau_pointer2str(buff,sz,p)	l_sprintf(buff,sz,"%p",p)
-
-
-/*
-@@ lau_number2strx converts a float to a hexadecimal numeral.
-** In C99, 'sprintf' (with format specifiers '%a'/'%A') does that.
-** Otherwise, you can leave 'lau_number2strx' undefined and Lau will
-** provide its own implementation.
-*/
-#if !defined(LAU_USE_C89)
-#define lau_number2strx(L,b,sz,f,n)  \
-	((void)L, l_sprintf(b,sz,f,(LAUI_UACNUMBER)(n)))
-#endif
 
 
 /*

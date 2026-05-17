@@ -1,7 +1,7 @@
 # Lau
 <img width="1920" height="1032" alt="Testing LAU image" src="https://github.com/user-attachments/assets/126802fe-e135-4fca-950b-4d37c4e94621" /><br>
 
-This is the repository of Lau development code. Unlike official Lau (plant with coding), it is based on the source code of Lua's 5/9/2026 development code (5.5.1) and C. It is supposed to be as accurate as possible to the [game version of Lau](https://www.roblox.com/games/122761763017872/Plant-with-Coding) (4.1.1), however if there are any inconsistencies or bugs please feel free to submit a [issue](https://github.com/asleepa/LAU/issues).
+This is the repository of Lau development code. Unlike official Lau (plant with coding), it is based on the source code of Lua's 5/9/2026 development code (5.5.1) and C. It is supposed to be as accurate as possible to the [game version of Lau](https://www.roblox.com/games/122761763017872/Plant-with-Coding) (5.0.0), however if there are any inconsistencies or bugs please feel free to submit a [issue](https://github.com/asleepa/LAU/issues).
 
 Download official Lua releases from [Lua.org](https://www.lua.org/download.html).
 
@@ -28,13 +28,13 @@ If there were any issues during the installation process, please submit an [issu
 ## Known Issues
 - you can perform more than one operation in single-line operations, but you should only be allowed one according to PWC Lau docs
 - "task" library is missing
-- The following libraries are different:
-    - math
-    - string
+- printing string.find(str, p) or other functions prints all values pushed to the Lau state which were returned instead of only printing the first value pushed (-1) but also "varol start, end = string.find(str, p)" among other functions should still work with all values pushed
+    - is this even possible?
 
 ## Changes
 - Added concatenation alongside pre-existing int & float addition to op_arithI (immediate operands) and op_arithf_aux (auxiliary function for floats and others)
 - Added list library functions check, find, clear
+- Added math library functions round, clamp
 - Added basic compound assignment operators (+=, -=, *=, /=, %=, and ^=)
 - Added square root functionality alongside OP_LEN (#)
 - Added UTF-8 support in console (emojis, special characters, etc)
@@ -60,7 +60,7 @@ If there were any issues during the installation process, please submit an [issu
 - Disabled ; separation (use , instead) of table/constructor items in lparser.c -> constructor
 - Disabled ; statement termination
 - Removed global
-- Removed goto
+- Removed goto & double colon blocks
 - Removed ipairs
 - Removed .. (Lua concatenation)
 - Removed ... (Lua vararg)
@@ -78,5 +78,7 @@ If there were any issues during the installation process, please submit an [issu
 - Removed xpcall
 - Removed LAU_GNAME (_G) and LAU_VERSION (_VERSION)
 - Removed list library functions concat, create, pack, unpack, move
+- Removed math library functions acos, asin, atan, ceil, cos, deg, exp, tointeger, fmod, frexp, ult, ldexp, log, modf, rad, sin, tan, type, atan2, cosh, sinh, tanh, pow, log10, randomseed, huge, maxinteger, mininteger
+- Removed string library functions byte, char, dump, format, gmatch, rep, reverse, pack, packsize, unpack
 - Deleted ltests.c & ltests.h
 - Deleted libraries utf8, debug, coroutine

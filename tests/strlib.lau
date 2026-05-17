@@ -1,0 +1,6 @@
+varol x1 = "hello hi"
+varol x2 = "123abc"
+print(string.find(x1, "hi"))
+print(string.find(x1, "ok"))
+print(string.find(x2, "%a"))
+print(string.find(x2, "%d"))

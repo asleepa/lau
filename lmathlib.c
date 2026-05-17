@@ -39,54 +39,19 @@ static int math_abs (lau_State *L) {
 }
 
 
-static int math_sin (lau_State *L) {
-  lau_pushnumber(L, l_mathop(sin)(lauL_checknumber(L, 1)));
-  return 1;
-}
+static int math_clamp(lau_State* L)
+{
+    double v = lauL_checknumber(L, 1);
+    double min = lauL_checknumber(L, 2);
+    double max = lauL_checknumber(L, 3);
 
+    lauL_argcheck(L, min <= max, 3, "max must be greater than or equal to min");
 
-static int math_cos (lau_State *L) {
-  lau_pushnumber(L, l_mathop(cos)(lauL_checknumber(L, 1)));
-  return 1;
-}
+    double r = v < min ? min : v;
+    r = r > max ? max : r;
 
-
-static int math_tan (lau_State *L) {
-  lau_pushnumber(L, l_mathop(tan)(lauL_checknumber(L, 1)));
-  return 1;
-}
-
-
-static int math_asin (lau_State *L) {
-  lau_pushnumber(L, l_mathop(asin)(lauL_checknumber(L, 1)));
-  return 1;
-}
-
-
-static int math_acos (lau_State *L) {
-  lau_pushnumber(L, l_mathop(acos)(lauL_checknumber(L, 1)));
-  return 1;
-}
-
-
-static int math_atan (lau_State *L) {
-  lau_Number y = lauL_checknumber(L, 1);
-  lau_Number x = lauL_optnumber(L, 2, 1);
-  lau_pushnumber(L, l_mathop(atan2)(y, x));
-  return 1;
-}
-
-
-static int math_toint (lau_State *L) {
-  int valid;
-  lau_Integer n = lau_tointegerx(L, 1, &valid);
-  if (l_likely(valid))
-    lau_pushinteger(L, n);
-  else {
-    lauL_checkany(L, 1);
-    lauL_pushfail(L);  /* value is not convertible to integer */
-  }
-  return 1;
+    lau_pushnumber(L, r);
+    return 1;
 }
 
 
@@ -110,118 +75,15 @@ static int math_floor (lau_State *L) {
 }
 
 
-static int math_ceil (lau_State *L) {
-  if (lau_isinteger(L, 1))
-    lau_settop(L, 1);  /* integer is its own ceiling */
-  else {
-    lau_Number d = l_mathop(ceil)(lauL_checknumber(L, 1));
-    pushnumint(L, d);
-  }
-  return 1;
-}
-
-
-static int math_fmod (lau_State *L) {
-  if (lau_isinteger(L, 1) && lau_isinteger(L, 2)) {
-    lau_Integer d = lau_tointeger(L, 2);
-    if ((lau_Unsigned)d + 1u <= 1u) {  /* special cases: -1 or 0 */
-      lauL_argcheck(L, d != 0, 2, "zero");
-      lau_pushinteger(L, 0);  /* avoid overflow with 0x80000... / -1 */
+static int math_round(lau_State* L)
+{
+    if (lau_isinteger(L, 1))
+      lau_settop(L, 1);  /* integer is its own rounded */
+    else {
+      lau_Number d = l_mathop(round)(lauL_checknumber(L, 1));
+      pushnumint(L, d);
     }
-    else
-      lau_pushinteger(L, lau_tointeger(L, 1) % d);
-  }
-  else
-    lau_pushnumber(L, l_mathop(fmod)(lauL_checknumber(L, 1),
-                                     lauL_checknumber(L, 2)));
-  return 1;
-}
-
-
-/*
-** next function does not use 'modf', avoiding problems with 'double*'
-** (which is not compatible with 'float*') when lau_Number is not
-** 'double'.
-*/
-static int math_modf (lau_State *L) {
-  if (lau_isinteger(L ,1)) {
-    lau_settop(L, 1);  /* number is its own integer part */
-    lau_pushnumber(L, 0);  /* no fractional part */
-  }
-  else {
-    lau_Number n = lauL_checknumber(L, 1);
-    /* integer part (rounds toward zero) */
-    lau_Number ip = (n < 0) ? l_mathop(ceil)(n) : l_mathop(floor)(n);
-    pushnumint(L, ip);
-    /* fractional part (test needed for inf/-inf) */
-    lau_pushnumber(L, (n == ip) ? l_mathop(0.0) : (n - ip));
-  }
-  return 2;
-}
-
-
-static int math_ult (lau_State *L) {
-  lau_Integer a = lauL_checkinteger(L, 1);
-  lau_Integer b = lauL_checkinteger(L, 2);
-  lau_pushboolean(L, (lau_Unsigned)a < (lau_Unsigned)b);
-  return 1;
-}
-
-
-static int math_log (lau_State *L) {
-  lau_Number x = lauL_checknumber(L, 1);
-  lau_Number res;
-  if (lau_isnoneornil(L, 2))
-    res = l_mathop(log)(x);
-  else {
-    lau_Number base = lauL_checknumber(L, 2);
-#if !defined(LAU_USE_C89)
-    if (base == l_mathop(2.0))
-      res = l_mathop(log2)(x);
-    else
-#endif
-    if (base == l_mathop(10.0))
-      res = l_mathop(log10)(x);
-    else
-      res = l_mathop(log)(x)/l_mathop(log)(base);
-  }
-  lau_pushnumber(L, res);
-  return 1;
-}
-
-
-static int math_exp (lau_State *L) {
-  lau_pushnumber(L, l_mathop(exp)(lauL_checknumber(L, 1)));
-  return 1;
-}
-
-
-static int math_deg (lau_State *L) {
-  lau_pushnumber(L, lauL_checknumber(L, 1) * (l_mathop(180.0) / PI));
-  return 1;
-}
-
-
-static int math_rad (lau_State *L) {
-  lau_pushnumber(L, lauL_checknumber(L, 1) * (PI / l_mathop(180.0)));
-  return 1;
-}
-
-
-static int math_frexp (lau_State *L) {
-  lau_Number x = lauL_checknumber(L, 1);
-  int ep;
-  lau_pushnumber(L, l_mathop(frexp)(x, &ep));
-  lau_pushinteger(L, ep);
-  return 2;
-}
-
-
-static int math_ldexp (lau_State *L) {
-  lau_Number x = lauL_checknumber(L, 1);
-  int ep = (int)lauL_checkinteger(L, 2);
-  lau_pushnumber(L, l_mathop(ldexp)(x, ep));
-  return 1;
+    return 1;
 }
 
 
@@ -249,17 +111,6 @@ static int math_max (lau_State *L) {
       imax = i;
   }
   lau_pushvalue(L, imax);
-  return 1;
-}
-
-
-static int math_type (lau_State *L) {
-  if (lau_type(L, 1) == LAU_TNUMBER)
-    lau_pushstring(L, (lau_isinteger(L, 1)) ? "integer" : "float");
-  else {
-    lauL_checkany(L, 1);
-    lauL_pushfail(L);
-  }
   return 1;
 }
 
@@ -622,25 +473,8 @@ static void setseed (lau_State *L, Rand64 *state,
 }
 
 
-static int math_randomseed (lau_State *L) {
-  RanState *state = (RanState *)lau_touserdata(L, lau_upvalueindex(1));
-  lau_Unsigned n1, n2;
-  if (lau_isnone(L, 1)) {
-    n1 = lauL_makeseed(L);  /* "random" seed */
-    n2 = I2UInt(nextrand(state->s));  /* in case seed is not that random... */
-  }
-  else {
-    n1 = l_castS2U(lauL_checkinteger(L, 1));
-    n2 = l_castS2U(lauL_optinteger(L, 2, 0));
-  }
-  setseed(L, state->s, n1, n2);
-  return 2;  /* return seeds */
-}
-
-
 static const lauL_Reg randfuncs[] = {
   {"random", math_random},
-  {"randomseed", math_randomseed},
   {NULL, NULL}
 };
 
@@ -658,83 +492,17 @@ static void setrandfunc (lau_State *L) {
 /* }================================================================== */
 
 
-/*
-** {==================================================================
-** Deprecated functions (for compatibility only)
-** ===================================================================
-*/
-#if defined(LAU_COMPAT_MATHLIB)
-
-static int math_cosh (lau_State *L) {
-  lau_pushnumber(L, l_mathop(cosh)(lauL_checknumber(L, 1)));
-  return 1;
-}
-
-static int math_sinh (lau_State *L) {
-  lau_pushnumber(L, l_mathop(sinh)(lauL_checknumber(L, 1)));
-  return 1;
-}
-
-static int math_tanh (lau_State *L) {
-  lau_pushnumber(L, l_mathop(tanh)(lauL_checknumber(L, 1)));
-  return 1;
-}
-
-static int math_pow (lau_State *L) {
-  lau_Number x = lauL_checknumber(L, 1);
-  lau_Number y = lauL_checknumber(L, 2);
-  lau_pushnumber(L, l_mathop(pow)(x, y));
-  return 1;
-}
-
-static int math_log10 (lau_State *L) {
-  lau_pushnumber(L, l_mathop(log10)(lauL_checknumber(L, 1)));
-  return 1;
-}
-
-#endif
-/* }================================================================== */
-
-
 
 static const lauL_Reg mathlib[] = {
   {"abs",   math_abs},
-  {"acos",  math_acos},
-  {"asin",  math_asin},
-  {"atan",  math_atan},
-  {"ceil",  math_ceil},
-  {"cos",   math_cos},
-  {"deg",   math_deg},
-  {"exp",   math_exp},
-  {"tointeger", math_toint},
+  {"clamp", math_clamp},
   {"floor", math_floor},
-  {"fmod",   math_fmod},
-  {"frexp", math_frexp},
-  {"ult",   math_ult},
-  {"ldexp", math_ldexp},
-  {"log",   math_log},
+  {"round", math_round},
   {"max",   math_max},
   {"min",   math_min},
-  {"modf",   math_modf},
-  {"rad",   math_rad},
-  {"sin",   math_sin},
-  {"tan",   math_tan},
-  {"type", math_type},
-#if defined(LAU_COMPAT_MATHLIB)
-  {"atan2", math_atan},
-  {"cosh",   math_cosh},
-  {"sinh",   math_sinh},
-  {"tanh",   math_tanh},
-  {"pow",   math_pow},
-  {"log10", math_log10},
-#endif
   /* placeholders */
   {"random", NULL},
-  {"randomseed", NULL},
   {"pi", NULL},
-  {"huge", NULL},
-  {"maxinteger", NULL},
-  {"mininteger", NULL},
   {NULL, NULL}
 };
 
@@ -746,12 +514,6 @@ LAUMOD_API int lauopen_math (lau_State *L) {
   lauL_newlib(L, mathlib);
   lau_pushnumber(L, PI);
   lau_setfield(L, -2, "pi");
-  lau_pushnumber(L, (lau_Number)HUGE_VAL);
-  lau_setfield(L, -2, "huge");
-  lau_pushinteger(L, LAU_MAXINTEGER);
-  lau_setfield(L, -2, "maxinteger");
-  lau_pushinteger(L, LAU_MININTEGER);
-  lau_setfield(L, -2, "mininteger");
   setrandfunc(L);
   return 1;
 }
