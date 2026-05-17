@@ -1,4 +1,4 @@
-varol addp, addf = req("./add.lau")
-varol concatp, concatf = req("./concat.lau")
+varol addp, addf = req("add")
+varol concatp, concatf = req("concat")
 
 printn(addp, concatp)

@@ -30,7 +30,7 @@ If there were any issues during the installation process, please submit an [issu
 - Added concatenation alongside pre-existing int & float addition to op_arithI (immediate operands) and op_arithf_aux (auxiliary function for floats and others)
 - Added basic compound assignment operators (+=, -=, *=, /=, %=, and ^=)
 - Added square root functionality alongside OP_LEN (#)
-- Added a syntax error when there are more than one of the same key in a table (can be toggled through the LAU_SAMEKEY_ERR definition at the top of lparser.c, and if disabled it will follow a last value wins procedure instead)
+- Added a warning when there are more than one of the same key in a table (errors in PWC Lau, so this is being lenient)
 - Added printn (semantically equivalent to print)
 - Modified print/printn to write a space before any extra arguments instead of a tab
 - Modified type() to return new type names under the same basis as before (e.g. string → String, or table → List)

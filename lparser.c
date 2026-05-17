@@ -13,7 +13,6 @@
 #include <limits.h>
 #include <string.h>
 #include <stdio.h>
-#include <stdbool.h>
 
 #include "lau.h"
 
@@ -30,15 +29,6 @@
 #include "lstring.h"
 #include "ltable.h"
 
-
-
-/* when there are more than one of the same key in a table, a
-   syntax error will be introduced which can be toggled through the
-   number 0/1 below, and if 0 a "last value wins" procedure
-   will be followed instead */
-#if !defined(LAU_SAMEKEY_ERR)
-#define LAU_SAMEKEY_ERR		1
-#endif
 
 
 /* maximum number of variable declarations per function (must be
@@ -1006,19 +996,21 @@ static void recfield (LexState *ls, ConsControl *cc) {
     codename(ls, &key);
   else  /* ls->t.token == '[' */
     yindex(ls, &key);
-  if (LAU_SAMEKEY_ERR > 0) {
-    for (i = 0; i < cc->nkeys; i++) {
-      if (keyequal(&cc->keys[i], &key))
-        lauX_syntaxerror(
-          ls,
-          lauO_pushfstring(ls->L, "this key is already defined: %s", getkeyname(&key))
-        );
-    }
-    if (cc->nkeys >= cc->keysize) {
-      int newsize = (cc->keysize == 0) ? 8 : cc->keysize * 2;
-      cc->keys = lauM_reallocvector(ls->L, cc->keys, cc->keysize, newsize, expdesc);
-      cc->keysize = newsize;
-    }
+  for (i = 0; i < cc->nkeys; i++) {
+    if (keyequal(&cc->keys[i], &key))
+      lau_writestringerror(
+        "%s\n",
+        lauO_pushfstring(
+          ls->L,
+          "warning: PWC Lau will error because a key was already defined: %s",
+          getkeyname(&key)
+        )
+      );
+  }
+  if (cc->nkeys >= cc->keysize) {
+    int newsize = (cc->keysize == 0) ? 8 : cc->keysize * 2;
+    cc->keys = lauM_reallocvector(ls->L, cc->keys, cc->keysize, newsize, expdesc);
+    cc->keysize = newsize;
   }
   cc->keys[cc->nkeys++] = key;
   cc->nh++;
@@ -1114,11 +1106,9 @@ static void constructor (LexState *ls, expdesc *t) {
   lauK_code(fs, 0);  /* space for extra arg. */
   cc.na = cc.nh = cc.tostore = 0;
   cc.t = t;
-  if (LAU_SAMEKEY_ERR > 0) {
-    cc.keys = NULL;
-    cc.nkeys = 0;
-    cc.keysize = 0;
-  }
+  cc.keys = NULL;
+  cc.nkeys = 0;
+  cc.keysize = 0;
   init_exp(t, VNONRELOC, fs->freereg);  /* table will be at stack top */
   lauK_reserveregs(fs, 1);
   init_exp(&cc.v, VVOID, 0);  /* no value (yet) */
@@ -1134,10 +1124,7 @@ static void constructor (LexState *ls, expdesc *t) {
   } while (testnext(ls, ','));
   check_match(ls, /*{*/ '}', '{' /*}*/, line);
   lastlistfield(fs, &cc);
-  if (LAU_SAMEKEY_ERR > 0) {
-    if (cc.keys != NULL) lauM_freearray(ls->L, cc.keys, cc.keysize);
-    lauK_setreturns(fs, t, 1);
-  }
+  if (cc.keys != NULL) lauM_freearray(ls->L, cc.keys, cc.keysize);
   lauK_settablesize(fs, pc, t->u.info, cc.na, cc.nh);
 }
 

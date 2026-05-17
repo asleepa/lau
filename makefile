@@ -97,7 +97,7 @@ AUX_O=	lauxlib.o
 LIB_O=	lbaselib.o ldblib.o liolib.o lmathlib.o loslib.o ltablib.o lstrlib.o \
 	lutf8lib.o loadlib.o lcorolib.o linit.o
 
-LAU_T=	lau
+LAU_T=	bin/lau
 LAU_O=	lau.o
 
 
