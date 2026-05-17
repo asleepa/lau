@@ -19,6 +19,11 @@
 #include "lauxlib.h"
 #include "laulib.h"
 #include "llimits.h"
+#include "lobject.h"
+#include "lstate.h"
+#include "lvm.h"
+#include "ltable.h"
+#include "lapi.h"
 
 
 /*
@@ -58,16 +63,6 @@ static void checktab (lau_State *L, int arg, int what) {
     else
       lauL_checktype(L, arg, LAU_TTABLE);  /* force an error */
   }
-}
-
-
-static int tcreate (lau_State *L) {
-  lau_Unsigned sizeseq = (lau_Unsigned)lauL_checkinteger(L, 1);
-  lau_Unsigned sizerest = (lau_Unsigned)lauL_optinteger(L, 2, 0);
-  lauL_argcheck(L, sizeseq <= cast_uint(INT_MAX), 1, "out of range");
-  lauL_argcheck(L, sizerest <= cast_uint(INT_MAX), 2, "out of range");
-  lau_createtable(L, cast_int(sizeseq), cast_int(sizerest));
-  return 1;
 }
 
 
@@ -120,109 +115,65 @@ static int tremove (lau_State *L) {
 
 
 /*
-** Copy elements (1[f], ..., 1[e]) into (tt[t], tt[t+1], ...). Whenever
-** possible, copy in increasing order, which is better for rehashing.
-** "possible" means destination after original range, or smaller
-** than origin, or copying to another table.
-*/
-static int tmove (lau_State *L) {
-  lau_Integer f = lauL_checkinteger(L, 2);
-  lau_Integer e = lauL_checkinteger(L, 3);
-  lau_Integer t = lauL_checkinteger(L, 4);
-  int tt = !lau_isnoneornil(L, 5) ? 5 : 1;  /* destination table */
-  checktab(L, 1, TAB_R);
-  checktab(L, tt, TAB_W);
-  if (e >= f) {  /* otherwise, nothing to move */
-    lau_Integer n, i;
-    lauL_argcheck(L, f > 0 || e < LAU_MAXINTEGER + f, 3,
-                  "too many elements to move");
-    n = e - f + 1;  /* number of elements to move */
-    lauL_argcheck(L, t <= LAU_MAXINTEGER - n + 1, 4,
-                  "destination wrap around");
-    if (t > e || t <= f || (tt != 1 && !lau_compare(L, 1, tt, LAU_OPEQ))) {
-      for (i = 0; i < n; i++) {
-        lau_geti(L, 1, f + i);
-        lau_seti(L, tt, t + i);
-      }
-    }
-    else {
-      for (i = n - 1; i >= 0; i--) {
-        lau_geti(L, 1, f + i);
-        lau_seti(L, tt, t + i);
-      }
-    }
-  }
-  lau_pushvalue(L, tt);  /* return destination table */
-  return 1;
-}
-
-
-static void addfield (lau_State *L, lauL_Buffer *b, lau_Integer i) {
-  lau_geti(L, 1, i);
-  if (l_unlikely(!lau_isstring(L, -1)))
-    lauL_error(L, "invalid value (%s) at index %I in table for 'concat'",
-                  lauL_typename(L, -1), (LAUI_UACINT)i);
-  lauL_addvalue(b);
-}
-
-
-static int tconcat (lau_State *L) {
-  lauL_Buffer b;
-  lau_Integer last = aux_getn(L, 1, TAB_R);
-  size_t lsep;
-  const char *sep = lauL_optlstring(L, 2, "", &lsep);
-  lau_Integer i = lauL_optinteger(L, 3, 1);
-  last = lauL_optinteger(L, 4, last);
-  lauL_buffinit(L, &b);
-  for (; i < last; i++) {
-    addfield(L, &b, i);
-    lauL_addlstring(&b, sep, lsep);
-  }
-  if (i == last)  /* add last value (if interval was not empty) */
-    addfield(L, &b, i);
-  lauL_pushresult(&b);
-  return 1;
-}
-
-
-/*
 ** {======================================================
-** Pack/unpack
+** Luau Functions
 ** =======================================================
 */
 
-static int tpack (lau_State *L) {
-  int i;
-  int n = lau_gettop(L);  /* number of elements to pack */
-  lau_createtable(L, n, 1);  /* create result table */
-  lau_insert(L, 1);  /* put it at index 1 */
-  for (i = n; i >= 1; i--)  /* assign elements */
-    lau_seti(L, 1, i);
-  lau_pushinteger(L, n);
-  lau_setfield(L, 1, "n");  /* t.n = number of elements */
-  return 1;  /* return table */
+static int tfind(lau_State* L)
+{
+    lauL_checktype(L, 1, LAU_TTABLE);
+    lauL_checkany(L, 2);
+    int init = lauL_optinteger(L, 3, 1);
+    if (init < 1)
+        lauL_argerror(L, 3, "index out of range");
+    for (int i = init;; ++i)
+    {
+        lau_rawgeti(L, 1, i);
+        if (lau_isnil(L, -1)) {
+          lau_pop(L, 1);
+          break;
+        }
+        if (lau_rawequal(L, 2, -1)) {
+          lau_pop(L, 1);
+          lau_pushinteger(L, i);
+          return 1;
+        }
+        lau_pop(L, 1);
+    }
+    lau_pushnil(L);
+    while (lau_next(L, 1)) {
+      if (lau_rawequal(L, 2, -1)) {
+        lau_pop(L, 1);
+        return 1;
+      }
+      lau_pop(L, 1);
+    }
+    lau_pushnil(L);
+    return 1;
 }
 
-
-static int tunpack (lau_State *L) {
-  lau_Unsigned n;
-  lau_Integer len = aux_getn(L, 1, TAB_R);
-  lau_Integer i = lauL_optinteger(L, 2, 1);
-  lau_Integer e = lauL_opt(L, lauL_checkinteger, 3, len);
-  if (i > e) return 0;  /* empty range */
-  n = l_castS2U(e) - l_castS2U(i);  /* number of elements minus 1 */
-  if (l_unlikely(n >= (unsigned int)INT_MAX  ||
-                 !lau_checkstack(L, (int)(++n))))
-    return lauL_error(L, "too many results to unpack");
-  for (; i < e; i++) {  /* push arg[i..e - 1] (to avoid overflows) */
-    lau_geti(L, 1, i);
+static int tclear(lau_State* L)
+{
+  lauL_checktype(L, 1, LAU_TTABLE);
+  lau_pushnil(L);
+  while (lau_next(L, 1)) {
+      lau_pop(L, 1);
+      lau_pushvalue(L, -1);
+      lau_pushnil(L);
+      lau_rawset(L, 1);
   }
-  lau_geti(L, 1, e);  /* push last element */
-  return (int)n;
+  return 0;
 }
 
 /* }====================================================== */
 
+
+static int tcheck(lau_State* L)
+{
+  lau_pushboolean(L, lau_type(L, 1) == LAU_TTABLE ? 1 : 0);
+  return 1;
+}
 
 
 /*
@@ -410,13 +361,11 @@ static int sort (lau_State *L) {
 
 
 static const lauL_Reg tab_funcs[] = {
-  {"concat", tconcat},
-  {"create", tcreate},
+  {"check", tcheck},
+  {"find", tfind},
+  {"clear", tclear},
   {"insert", tinsert},
-  {"pack", tpack},
-  {"unpack", tunpack},
   {"remove", tremove},
-  {"move", tmove},
   {"sort", sort},
   {NULL, NULL}
 };

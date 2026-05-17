@@ -17,33 +17,36 @@ Download official Lua releases from [Lua.org](https://www.lua.org/download.html)
 6. Close and reopen the terminal, again cd'ing to your LAU path (step 3).
 7. If you are on Linux: delete the "makefile" file and rename the "makefile-linux" file to "makefile"
 8. Run one simple command: `make`
-9. You should have a "lau.exe" in the folder now. You can run commands such as:
+9. You should have a "lau.exe" in the "bin" folder now. Go to it:
+<br>`cd bin`
+10. Now you can run commands such as:
 <br>`lau` which will open a command-line interactive version which allows you to do i.e. `varol x = "a" print(x)`
-<br> or `lau tests/inpairs.lau` which allows you to execute full lau files.
+<br> or `lau example_file.lau` which allows you to execute full lau files.
 
 If there were any issues during the installation process, please submit an [issue](https://github.com/asleepa/LAU/issues).
 
 ## Known Issues
-- req() works with .lau files, but it should only work with .laum files
 - you can perform more than one operation in single-line operations, but you should only be allowed one according to PWC Lau docs
-- system error (or warning in our case) for division by zero instead of returning "inf"
+- "task" library is missing
 - The following libraries are different:
     - math
-    - task
     - string
-    - list (rename from table)
 
 ## Changes
 - Added concatenation alongside pre-existing int & float addition to op_arithI (immediate operands) and op_arithf_aux (auxiliary function for floats and others)
+- Added list library functions check, find, clear
 - Added basic compound assignment operators (+=, -=, *=, /=, %=, and ^=)
 - Added square root functionality alongside OP_LEN (#)
 - Added UTF-8 support in console (emojis, special characters, etc)
 - Added printn (semantically equivalent to print)
+- Modified package library to return null and not expose itself while allowing req() as global
 - Modified lists/tables to warn when there are more than one of the same key
 - Modified division arithmetic to error when dividing by zero
 - Modified division arithmetic to return an integer if possible instead of always returning a float
 - Modified print/printn to write a space before any extra arguments instead of a tab
 - Modified type() to return new type names under the same basis as before (e.g. string → String, or table → List)
+- Modified Lau config default paths to only allow req() to work with .laum and .dll files instead of .lau and .dll files
+- Changed table (lib) → list
 - Changed local → varol
 - Changed function → func
 - Changed require → req
@@ -62,7 +65,7 @@ If there were any issues during the installation process, please submit an [issu
 - Removed .. (Lua concatenation)
 - Removed ... (Lua vararg)
 - Removed // (floor division)
-- Removed bitwise operators BAND (&), BOR (|), BXOR (\~), SHL (<<), SHR (>>) AND BNOT (\~)
+- Removed bitwise operators BAND (&), BOR (|), BXOR (\~), SHL (<<), SHR (>>), BNOT (\~)
 - Removed math.sqrt
 - Removed assert
 - Removed collectgarbage
@@ -74,4 +77,6 @@ If there were any issues during the installation process, please submit an [issu
 - Removed select
 - Removed xpcall
 - Removed LAU_GNAME (_G) and LAU_VERSION (_VERSION)
+- Removed list library functions concat, create, pack, unpack, move
 - Deleted ltests.c & ltests.h
+- Deleted libraries utf8, debug, coroutine

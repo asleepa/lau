@@ -94,8 +94,8 @@ CORE_O=	lapi.o lcode.o lctype.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o \
 	lmem.o lobject.o lopcodes.o lparser.o lstate.o lstring.o ltable.o \
 	ltm.o lundump.o lvm.o lzio.o
 AUX_O=	lauxlib.o
-LIB_O=	lbaselib.o ldblib.o liolib.o lmathlib.o loslib.o ltablib.o lstrlib.o \
-	lutf8lib.o loadlib.o lcorolib.o linit.o
+LIB_O=	lbaselib.o liolib.o lmathlib.o loslib.o ltablib.o lstrlib.o \
+	loadlib.o linit.o
 
 LAU_T=	bin/lau
 LAU_O=	lau.o
@@ -142,16 +142,14 @@ echo:
 lapi.o: lapi.c lprefix.h lau.h lauconf.h lapi.h llimits.h lstate.h \
  lobject.h ltm.h lzio.h lmem.h ldebug.h ldo.h lfunc.h lgc.h lstring.h \
  ltable.h lundump.h lvm.h
+lau.o: lau.c lprefix.h lau.h lauconf.h lauxlib.h laulib.h llimits.h
 lauxlib.o: lauxlib.c lprefix.h lau.h lauconf.h lauxlib.h llimits.h
 lbaselib.o: lbaselib.c lprefix.h lau.h lauconf.h lauxlib.h laulib.h \
  llimits.h
 lcode.o: lcode.c lprefix.h lau.h lauconf.h lcode.h llex.h lobject.h \
  llimits.h lzio.h lmem.h lopcodes.h lparser.h ldebug.h lstate.h ltm.h \
  ldo.h lgc.h lstring.h ltable.h lvm.h lopnames.h
-lcorolib.o: lcorolib.c lprefix.h lau.h lauconf.h lauxlib.h laulib.h \
- llimits.h
 lctype.o: lctype.c lprefix.h lctype.h lau.h lauconf.h llimits.h
-ldblib.o: ldblib.c lprefix.h lau.h lauconf.h lauxlib.h laulib.h llimits.h
 ldebug.o: ldebug.c lprefix.h lau.h lauconf.h lapi.h llimits.h lstate.h \
  lobject.h ltm.h lzio.h lmem.h lcode.h llex.h lopcodes.h lparser.h \
  ldebug.h ldo.h lfunc.h lstring.h lgc.h ltable.h lvm.h
@@ -194,15 +192,13 @@ lstrlib.o: lstrlib.c lprefix.h lau.h lauconf.h lauxlib.h laulib.h \
 ltable.o: ltable.c lprefix.h lau.h lauconf.h ldebug.h lstate.h lobject.h \
  llimits.h ltm.h lzio.h lmem.h ldo.h lgc.h lstring.h ltable.h lvm.h
 ltablib.o: ltablib.c lprefix.h lau.h lauconf.h lauxlib.h laulib.h \
- llimits.h
+ llimits.h lobject.h lstate.h ltm.h lzio.h lmem.h lvm.h ldo.h ltable.h \
+ lapi.h
 ltm.o: ltm.c lprefix.h lau.h lauconf.h ldebug.h lstate.h lobject.h \
  llimits.h ltm.h lzio.h lmem.h ldo.h lgc.h lstring.h ltable.h lvm.h
-lau.o: lau.c lprefix.h lau.h lauconf.h lauxlib.h laulib.h llimits.h
 lundump.o: lundump.c lprefix.h lau.h lauconf.h ldebug.h lstate.h \
  lobject.h llimits.h ltm.h lzio.h lmem.h ldo.h lfunc.h lstring.h lgc.h \
  ltable.h lundump.h
-lutf8lib.o: lutf8lib.c lprefix.h lau.h lauconf.h lauxlib.h laulib.h \
- llimits.h
 lvm.o: lvm.c lprefix.h lau.h lauconf.h lapi.h llimits.h lstate.h \
  lobject.h ltm.h lzio.h lmem.h ldebug.h ldo.h lfunc.h lgc.h lopcodes.h \
  lstring.h ltable.h lvm.h ljumptab.h

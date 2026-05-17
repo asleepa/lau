@@ -228,10 +228,10 @@
 
 #if !defined(LAU_PATH_DEFAULT)
 #define LAU_PATH_DEFAULT  \
-		LAU_LDIR "?.lau;"  LAU_LDIR "?\\init.lau;" \
-		LAU_CDIR "?.lau;"  LAU_CDIR "?\\init.lau;" \
-		LAU_SHRDIR "?.lau;"  LAU_SHRDIR "?\\init.lau;" \
-		".\\?.lau;" ".\\?\\init.lau"
+		LAU_LDIR "?.laum;"  LAU_LDIR "?\\init.laum;" \
+		LAU_CDIR "?.laum;"  LAU_CDIR "?\\init.laum;" \
+		LAU_SHRDIR "?.laum;"  LAU_SHRDIR "?\\init.laum;" \
+		".\\?.laum;" ".\\?\\init.laum"
 #endif
 
 #if !defined(LAU_CPATH_DEFAULT)

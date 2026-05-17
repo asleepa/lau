@@ -402,21 +402,6 @@ static int lookforfunc (lau_State *L, const char *path, const char *sym) {
 }
 
 
-static int ll_loadlib (lau_State *L) {
-  const char *path = lauL_checkstring(L, 1);
-  const char *init = lauL_checkstring(L, 2);
-  int stat = lookforfunc(L, path, init);
-  if (l_likely(stat == 0))  /* no errors? */
-    return 1;  /* return the loaded function */
-  else {  /* error; error message is on stack top */
-    lauL_pushfail(L);
-    lau_insert(L, -2);
-    lau_pushstring(L, (stat == ERRLIB) ?  LIB_FAIL : "init");
-    return 3;  /* return fail, error message, and where */
-  }
-}
-
-
 
 /*
 ** {======================================================
@@ -496,20 +481,6 @@ static const char *searchpath (lau_State *L, const char *name,
   lauL_pushresult(&buff);  /* push path to create error message */
   pusherrornotfound(L, lau_tostring(L, -1));  /* create error message */
   return NULL;  /* not found */
-}
-
-
-static int ll_searchpath (lau_State *L) {
-  const char *f = searchpath(L, lauL_checkstring(L, 1),
-                                lauL_checkstring(L, 2),
-                                lauL_optstring(L, 3, "."),
-                                lauL_optstring(L, 4, LAU_DIRSEP));
-  if (f != NULL) return 1;
-  else {  /* error message is on top of the stack */
-    lauL_pushfail(L);
-    lau_insert(L, -2);
-    return 2;  /* return fail + error message */
-  }
 }
 
 
@@ -682,20 +653,6 @@ static int ll_require (lau_State *L) {
 
 
 static const lauL_Reg pk_funcs[] = {
-  {"loadlib", ll_loadlib},
-  {"searchpath", ll_searchpath},
-  /* placeholders */
-  {"preload", NULL},
-  {"cpath", NULL},
-  {"path", NULL},
-  {"searchers", NULL},
-  {"loaded", NULL},
-  {NULL, NULL}
-};
-
-
-static const lauL_Reg ll_funcs[] = {
-  {"req", ll_require},
   {NULL, NULL}
 };
 
@@ -739,10 +696,10 @@ LAUMOD_API int lauopen_package (lau_State *L) {
   /* set field 'preload' */
   lauL_getsubtable(L, LAU_REGISTRYINDEX, LAU_PRELOAD_TABLE);
   lau_setfield(L, -2, "preload");
-  lau_pushglobaltable(L);
-  lau_pushvalue(L, -2);  /* set 'package' as upvalue for next lib */
-  lauL_setfuncs(L, ll_funcs, 1);  /* open lib into global table */
+  lau_pushvalue(L, -1);  /* set 'package' as upvalue */
+  lau_pushcclosure(L, ll_require, 1);
+  lau_setglobal(L, "req"); /* open req into global table */
   lau_pop(L, 1);  /* pop global table */
-  return 1;  /* return 'package' table */
+  return 0;
 }
 

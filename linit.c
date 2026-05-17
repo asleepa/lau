@@ -28,14 +28,11 @@
 static const lauL_Reg stdlibs[] = {
   {LAU_GNAME, lauopen_base},
   {LAU_LOADLIBNAME, lauopen_package},
-  {LAU_COLIBNAME, lauopen_coroutine},
-  {LAU_DBLIBNAME, lauopen_debug},
   {LAU_IOLIBNAME, lauopen_io},
   {LAU_MATHLIBNAME, lauopen_math},
   {LAU_OSLIBNAME, lauopen_os},
   {LAU_STRLIBNAME, lauopen_string},
   {LAU_TABLIBNAME, lauopen_table},
-  {LAU_UTF8LIBNAME, lauopen_utf8},
   {NULL, NULL}
 };
 

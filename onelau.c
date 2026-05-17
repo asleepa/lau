@@ -108,15 +108,12 @@
 /* standard library  -- not used by lauc */
 #ifndef MAKE_LAUC
 #include "lbaselib.c"
-#include "lcorolib.c"
-#include "ldblib.c"
 #include "liolib.c"
 #include "lmathlib.c"
 #include "loadlib.c"
 #include "loslib.c"
 #include "lstrlib.c"
 #include "ltablib.c"
-#include "lutf8lib.c"
 #include "linit.c"
 #endif
 

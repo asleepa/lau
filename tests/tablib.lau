@@ -1,0 +1,22 @@
+varol x1 = {"hello", "world", "!"}
+varol x2 = {["a"] = "b"}
+
+print("--find--")
+print(list.find(x1, "hello")) -- 1
+print(list.find(x1, "world")) -- 2
+print(list.find(x1, "!")) -- 3
+print(list.find(x1, "not_an_element")) -- null
+
+print(list.find(x2, "b")) -- a
+print(list.find(x2, "a")) -- null
+
+print("--clear--")
+print("now x1:", x1)
+print("now x1 len:", #x1)
+list.clear(x1)
+print("new x1:", x1)
+print("new x1 len:", #x1)
+
+print("--check--")
+print("x1 is list:", list.check(x1))
+print("imm is list:", list.check(true))

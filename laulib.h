@@ -22,14 +22,6 @@ LAUMOD_API int (lauopen_base) (lau_State *L);
 LAUMOD_API int (lauopen_package) (lau_State *L);
 
 
-#define LAU_COLIBNAME	"coroutine"
-#define LAU_COLIBK	(LAU_LOADLIBK << 1)
-LAUMOD_API int (lauopen_coroutine) (lau_State *L);
-
-#define LAU_DBLIBNAME	"debug"
-#define LAU_DBLIBK	(LAU_COLIBK << 1)
-LAUMOD_API int (lauopen_debug) (lau_State *L);
-
 #define LAU_IOLIBNAME	"io"
 #define LAU_IOLIBK	(LAU_DBLIBK << 1)
 LAUMOD_API int (lauopen_io) (lau_State *L);
@@ -46,13 +38,9 @@ LAUMOD_API int (lauopen_os) (lau_State *L);
 #define LAU_STRLIBK	(LAU_OSLIBK << 1)
 LAUMOD_API int (lauopen_string) (lau_State *L);
 
-#define LAU_TABLIBNAME	"table"
+#define LAU_TABLIBNAME	"list"
 #define LAU_TABLIBK	(LAU_STRLIBK << 1)
 LAUMOD_API int (lauopen_table) (lau_State *L);
-
-#define LAU_UTF8LIBNAME	"utf8"
-#define LAU_UTF8LIBK	(LAU_TABLIBK << 1)
-LAUMOD_API int (lauopen_utf8) (lau_State *L);
 
 
 /* open selected libraries */
