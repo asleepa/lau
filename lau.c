@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <locale.h>
 
 #include <signal.h>
 
@@ -724,6 +725,7 @@ static void doREPL (lau_State *L) {
 #endif
 
 
+
 /*
 ** Main body of stand-alone interpreter (to be called in protected mode).
 ** Reads the options and handles them all.
@@ -775,6 +777,11 @@ static int pmain (lau_State *L) {
 
 
 int main (int argc, char **argv) {
+  #if defined(LAU_USE_WINDOWS)
+    SetConsoleCP(CP_UTF8);
+  #else
+    setlocale(LC_ALL, "");
+  #endif
   int status, result;
   lau_State *L = lauL_newstate();  /* create state */
   if (L == NULL) {

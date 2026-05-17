@@ -58,6 +58,7 @@ LAUI_DDEF const lu_byte lauP_opmodes[NUM_OPCODES] = {
  ,opmode(1, 0, 0, 0, 0, iABC)		/* OP_MMBIN */
  ,opmode(1, 0, 0, 0, 0, iABC)		/* OP_MMBINI */
  ,opmode(1, 0, 0, 0, 0, iABC)		/* OP_MMBINK */
+ ,opmode(0, 0, 0, 0, 1, iABC)		/* OP_UNM */
  ,opmode(0, 0, 0, 0, 1, iABC)		/* OP_NOT */
  ,opmode(0, 0, 0, 0, 1, iABC)		/* OP_LEN */
  ,opmode(0, 0, 0, 0, 0, iABC)		/* OP_CLOSE */

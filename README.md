@@ -24,14 +24,24 @@ Download official Lua releases from [Lua.org](https://www.lua.org/download.html)
 If there were any issues during the installation process, please submit an [issue](https://github.com/asleepa/LAU/issues).
 
 ## Known Issues
-- Print/printn doesn't work with emojis.
+- req() works with .lau files, but it should only work with .laum files
+- you can perform more than one operation in single-line operations, but you should only be allowed one according to PWC Lau docs
+- system error (or warning in our case) for division by zero instead of returning "inf"
+- The following libraries are different:
+    - math
+    - task
+    - string
+    - list (rename from table)
 
 ## Changes
 - Added concatenation alongside pre-existing int & float addition to op_arithI (immediate operands) and op_arithf_aux (auxiliary function for floats and others)
 - Added basic compound assignment operators (+=, -=, *=, /=, %=, and ^=)
 - Added square root functionality alongside OP_LEN (#)
-- Added a warning when there are more than one of the same key in a table (errors in PWC Lau, so this is being lenient)
+- Added UTF-8 support in console (emojis, special characters, etc)
 - Added printn (semantically equivalent to print)
+- Modified lists/tables to warn when there are more than one of the same key
+- Modified division arithmetic to error when dividing by zero
+- Modified division arithmetic to return an integer if possible instead of always returning a float
 - Modified print/printn to write a space before any extra arguments instead of a tab
 - Modified type() to return new type names under the same basis as before (e.g. string → String, or table → List)
 - Changed local → varol
@@ -52,7 +62,7 @@ If there were any issues during the installation process, please submit an [issu
 - Removed .. (Lua concatenation)
 - Removed ... (Lua vararg)
 - Removed // (floor division)
-- Removed bitwise operators BAND (&), BOR (|), BXOR (\~), SHL (<<), SHR (>>), UNM (\~), AND BNOT (\~)
+- Removed bitwise operators BAND (&), BOR (|), BXOR (\~), SHL (<<), SHR (>>) AND BNOT (\~)
 - Removed math.sqrt
 - Removed assert
 - Removed collectgarbage

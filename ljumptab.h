@@ -62,6 +62,7 @@ static const void *const disptab[NUM_OPCODES] = {
 &&L_OP_MMBIN,
 &&L_OP_MMBINI,
 &&L_OP_MMBINK,
+&&L_OP_UNM,
 &&L_OP_NOT,
 &&L_OP_LEN,
 &&L_OP_CLOSE,

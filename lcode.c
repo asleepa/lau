@@ -1430,7 +1430,7 @@ l_sinline OpCode binopr2op (BinOpr opr, BinOpr baser, OpCode base) {
 */
 l_sinline OpCode unopr2op (UnOpr opr) {
   return cast(OpCode, (cast_int(opr) - cast_int(OPR_MINUS)) +
-                                       cast_int(OP_MMBINK));
+                                       cast_int(OP_UNM));
 }
 
 

@@ -278,6 +278,7 @@ OP_MMBIN,/*	A B C	call C metamethod over R[A] and R[B]		*/
 OP_MMBINI,/*	A sB C k	call C metamethod over R[A] and sB	*/
 OP_MMBINK,/*	A B C k		call C metamethod over R[A] and K[B]	*/
 
+OP_UNM,/*	A B	R[A] := -R[B]					*/
 OP_NOT,/*	A B	R[A] := not R[B]				*/
 OP_LEN,/*	A B	R[A] := #R[B] (length operator)			*/
 

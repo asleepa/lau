@@ -50,6 +50,7 @@ static const char *const opnames[] = {
   "MMBIN",
   "MMBINI",
   "MMBINK",
+  "UNM",
   "NOT",
   "LEN",
   "CLOSE",

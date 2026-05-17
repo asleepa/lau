@@ -747,7 +747,10 @@ void lauV_objlen (lau_State *L, StkId ra, const TValue *rb) {
       return;
     }
     case LAU_VNUMINT: case LAU_VNUMFLT: {
-      lau_Number root = l_mathop(sqrt)(nvalue(rb));
+      lau_Number n = nvalue(rb);
+      if (n < 0)
+        lauG_runerror(L, "the square root of a negative number cannot be taken");
+      lau_Number root = l_mathop(sqrt)(n);
       lau_Integer rooti = (lau_Integer)root;
       if (root == rooti) {
         setivalue(s2v(ra), rooti);
@@ -835,7 +838,7 @@ void lauV_finishOp (lau_State *L) {
       setobjs2s(L, base + GETARG_A(*(ci->u.l.savedpc - 2)), --L->top.p);
       break;
     }
-    case OP_LEN:
+    case OP_UNM: case OP_LEN:
     case OP_GETTABUP: case OP_GETTABLE: case OP_GETI:
     case OP_GETFIELD: case OP_SELF: {
       setobjs2s(L, base + GETARG_A(inst), --L->top.p);
@@ -1517,6 +1520,21 @@ void lauV_execute (lau_State *L, CallInfo *ci) {
         int flip = GETARG_k(i);
         StkId result = RA(pi);
         Protect(lauT_trybinassocTM(L, s2v(ra), imm, flip, result, tm));
+        vmbreak;
+      }
+      vmcase(OP_UNM) {
+        StkId ra = RA(i);
+        TValue *rb = vRB(i);
+        lau_Number nb;
+        if (ttisinteger(rb)) {
+          lau_Integer ib = ivalue(rb);
+          setivalue(s2v(ra), intop(-, 0, ib));
+        }
+        else if (tonumberns(rb, nb)) {
+          setfltvalue(s2v(ra), laui_numunm(L, nb));
+        }
+        else
+          Protect(lauT_trybinTM(L, rb, rb, ra, TM_UNM));
         vmbreak;
       }
       vmcase(OP_NOT) {

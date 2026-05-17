@@ -41,7 +41,7 @@ void lauT_init (lau_State *L) {
     "__gc", "__mode", "__len", "__eq",
     "__add", "__sub", "__mul", "__mod", "__pow",
     "__div",
-    "__lt", "__le",
+    "__unm", "__lt", "__le",
     "__concat", "__call", "__close"
   };
   int i;
