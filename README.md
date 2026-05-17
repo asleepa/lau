@@ -27,12 +27,13 @@ If there were any issues during the installation process, please submit an [issu
 
 ## Known Issues
 - you can perform more than one operation in single-line operations, but you should only be allowed one according to PWC Lau docs
-- "task" library is missing
+- "task" library is missing (date, time, wait)
 - printing string.find(str, p) or other functions prints all values pushed to the Lau state which were returned instead of only printing the first value pushed (-1) but also "varol start, end = string.find(str, p)" among other functions should still work with all values pushed
     - is this even possible?
 
 ## Changes
 - Added concatenation alongside pre-existing int & float addition to op_arithI (immediate operands) and op_arithf_aux (auxiliary function for floats and others)
+- Added task library containing functions date, clock, time, wait
 - Added list library functions check, find, clear
 - Added math library functions round, clamp
 - Added basic compound assignment operators (+=, -=, *=, /=, %=, and ^=)
@@ -80,5 +81,6 @@ If there were any issues during the installation process, please submit an [issu
 - Removed list library functions concat, create, pack, unpack, move
 - Removed math library functions acos, asin, atan, ceil, cos, deg, exp, tointeger, fmod, frexp, ult, ldexp, log, modf, rad, sin, tan, type, atan2, cosh, sinh, tanh, pow, log10, randomseed, huge, maxinteger, mininteger
 - Removed string library functions byte, char, dump, format, gmatch, rep, reverse, pack, packsize, unpack
+- Removed os library functions clock, date, time (replaced with task library functions)
 - Deleted ltests.c & ltests.h
 - Deleted libraries utf8, debug, coroutine

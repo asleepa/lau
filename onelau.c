@@ -114,6 +114,7 @@
 #include "loslib.c"
 #include "lstrlib.c"
 #include "ltablib.c"
+#include "ltasklib.c"
 #include "linit.c"
 #endif
 

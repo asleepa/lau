@@ -42,6 +42,9 @@ LAUMOD_API int (lauopen_string) (lau_State *L);
 #define LAU_TABLIBK	(LAU_STRLIBK << 1)
 LAUMOD_API int (lauopen_table) (lau_State *L);
 
+#define LAU_TASKLIBNAME	"task"
+#define LAU_TASKLIBK	(LAU_TABLIBK << 1)
+LAUMOD_API int (lauopen_task) (lau_State *L);
 
 /* open selected libraries */
 LAULIB_API void (lauL_openselectedlibs) (lau_State *L, int load, int preload);

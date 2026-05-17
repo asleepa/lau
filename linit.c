@@ -33,6 +33,7 @@ static const lauL_Reg stdlibs[] = {
   {LAU_OSLIBNAME, lauopen_os},
   {LAU_STRLIBNAME, lauopen_string},
   {LAU_TABLIBNAME, lauopen_table},
+  {LAU_TASKLIBNAME, lauopen_task},
   {NULL, NULL}
 };
 

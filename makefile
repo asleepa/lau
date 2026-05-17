@@ -94,7 +94,7 @@ CORE_O=	lapi.o lcode.o lctype.o ldebug.o ldo.o ldump.o lfunc.o lgc.o llex.o \
 	lmem.o lobject.o lopcodes.o lparser.o lstate.o lstring.o ltable.o \
 	ltm.o lundump.o lvm.o lzio.o
 AUX_O=	lauxlib.o
-LIB_O=	lbaselib.o liolib.o lmathlib.o loslib.o ltablib.o lstrlib.o \
+LIB_O=	lbaselib.o liolib.o lmathlib.o loslib.o ltablib.o lstrlib.o ltasklib.o \
 	loadlib.o linit.o
 
 LAU_T=	bin/lau
@@ -194,6 +194,7 @@ ltable.o: ltable.c lprefix.h lau.h lauconf.h ldebug.h lstate.h lobject.h \
 ltablib.o: ltablib.c lprefix.h lau.h lauconf.h lauxlib.h laulib.h \
  llimits.h lobject.h lstate.h ltm.h lzio.h lmem.h lvm.h ldo.h ltable.h \
  lapi.h
+ltasklib.o: ltasklib.c lprefix.h lau.h lauconf.h lauxlib.h llimits.h
 ltm.o: ltm.c lprefix.h lau.h lauconf.h ldebug.h lstate.h lobject.h \
  llimits.h ltm.h lzio.h lmem.h ldo.h lgc.h lstring.h ltable.h lvm.h
 lundump.o: lundump.c lprefix.h lau.h lauconf.h ldebug.h lstate.h \

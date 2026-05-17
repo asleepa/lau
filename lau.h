@@ -515,6 +515,7 @@ struct lau_Debug {
 
 /******************************************************************************
 * Copyright (C) 1994-2026 Lua.org, PUC-Rio.
+* Modified 2026, asleepa.
 *
 * Permission is hereby granted, free of charge, to any person obtaining
 * a copy of this software and associated documentation files (the
