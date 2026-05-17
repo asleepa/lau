@@ -27,7 +27,6 @@ If there were any issues during the installation process, please submit an [issu
 
 ## Known Issues
 - you can perform more than one operation in single-line operations, but you should only be allowed one according to PWC Lau docs
-- "task" library is missing (date, time, wait)
 - printing string.find(str, p) or other functions prints all values pushed to the Lau state which were returned instead of only printing the first value pushed (-1) but also "varol start, end = string.find(str, p)" among other functions should still work with all values pushed
     - is this even possible?
 
