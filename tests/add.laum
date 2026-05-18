@@ -51,4 +51,4 @@ for op, o inpairs(auxConditions) do
     end
 end
 
-return passed, failed
+return {passed, failed}

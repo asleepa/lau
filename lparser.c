@@ -1131,6 +1131,22 @@ static void constructor (LexState *ls, expdesc *t) {
 /* }====================================================================== */
 
 
+static int initsl (LexState *ls, int *startline) {
+  int isSl = (ls->linenumber == *startline);
+  if (isSl) {
+    ls->slStmtCount = 0;
+    ls->slStartLine = *startline;
+  }
+  return isSl;
+}
+
+
+static void slstmtcheck (LexState *ls, int *isSl, const char *exp) {
+  if (*isSl && ls->slStmtCount > 1)
+    lauX_syntaxerror(ls, lauO_pushfstring(ls->L, "'%s' expected", exp));
+}
+
+
 static void setvararg (FuncState *fs) {
   fs->f->flag |= PF_VAHID;  /* by default, use hidden vararg arguments */
   lauK_codeABC(fs, OP_VARARGPREP, 0, 0, 0);
@@ -1170,6 +1186,7 @@ static void body (LexState *ls, expdesc *e, int ismethod, int line) {
   /* body ->  '(' parlist ')' block END */
   FuncState new_fs;
   BlockCnt bl;
+  int startline = ls->linenumber;
   new_fs.f = addprototype(ls);
   new_fs.f->linedefined = line;
   open_func(ls, &new_fs, &bl);
@@ -1180,7 +1197,9 @@ static void body (LexState *ls, expdesc *e, int ismethod, int line) {
   }
   parlist(ls);
   checknext(ls, ')');
+  int isSl = initsl(ls, &startline);
   statlist(ls);
+  slstmtcheck(ls, &isSl, "end");
   new_fs.f->lastlinedefined = ls->linenumber;
   check_match(ls, TK_END, TK_FUNCTION, line);
   codeclosure(ls, e);
@@ -1646,42 +1665,20 @@ static void whilestat (LexState *ls, int line) {
   FuncState *fs = ls->fs;
   int whileinit;
   int condexit;
+  int startline = ls->linenumber;
   BlockCnt bl;
   lauX_next(ls);  /* skip WHILE */
   whileinit = lauK_getlabel(fs);
   condexit = cond(ls);
   enterblock(fs, &bl, 1);
   checknext(ls, TK_DO);
+  int isSl = initsl(ls, &startline);
   block(ls);
+  slstmtcheck(ls, &isSl, "end");
   lauK_jumpto(fs, whileinit);
   check_match(ls, TK_END, TK_WHILE, line);
   leaveblock(fs);
   lauK_patchtohere(fs, condexit);  /* false conditions finish the loop */
-}
-
-
-static void repeatstat (LexState *ls, int line) {
-  /* repeatstat -> REPEAT block UNTIL cond */
-  int condexit;
-  FuncState *fs = ls->fs;
-  int repeat_init = lauK_getlabel(fs);
-  BlockCnt bl1, bl2;
-  enterblock(fs, &bl1, 1);  /* loop block */
-  enterblock(fs, &bl2, 0);  /* scope block */
-  lauX_next(ls);  /* skip REPEAT */
-  statlist(ls);
-  check_match(ls, TK_UNTIL, TK_REPEAT, line);
-  condexit = cond(ls);  /* read condition (inside scope block) */
-  leaveblock(fs);  /* finish scope */
-  if (bl2.upval) {  /* upvalues? */
-    int exit = lauK_jump(fs);  /* normal exit must jump over fix */
-    lauK_patchtohere(fs, condexit);  /* repetition must close upvalues */
-    lauK_codeABC(fs, OP_CLOSE, reglevel(fs, bl2.nactvar), 0, 0);
-    condexit = lauK_jump(fs);  /* repeat after closing upvalues */
-    lauK_patchtohere(fs, exit);  /* normal exit comes to here */
-  }
-  lauK_patchlist(fs, condexit, repeat_init);  /* close the loop */
-  leaveblock(fs);  /* finish loop */
 }
 
 
@@ -1724,13 +1721,16 @@ static void forbody (LexState *ls, int base, int line, int nvars, int isgen) {
   BlockCnt bl;
   FuncState *fs = ls->fs;
   int prep, endfor;
+  int startline = ls->linenumber;
   checknext(ls, TK_DO);
   prep = lauK_codeABx(fs, forprep[isgen], base, 0);
   fs->freereg--;  /* both 'forprep' remove one register from the stack */
   enterblock(fs, &bl, 0);  /* scope for declared variables */
   adjustlocalvars(ls, nvars);
   lauK_reserveregs(fs, nvars);
+  int isSl = initsl(ls, &startline);
   block(ls);
+  slstmtcheck(ls, &isSl, "end");
   leaveblock(fs);  /* end of scope for declared variables */
   fixforjump(fs, prep, lauK_getlabel(fs), 0);
   if (isgen) {  /* generic for? */
@@ -1822,10 +1822,13 @@ static void test_then_block (LexState *ls, int *escapelist) {
   /* test_then_block -> [IF | ELSEIF] cond THEN block */
   FuncState *fs = ls->fs;
   int condtrue;
+  int startline = ls->linenumber;
   lauX_next(ls);  /* skip IF or ELSEIF */
   condtrue = cond(ls);  /* read condition */
   checknext(ls, TK_THEN);
+  int isSl = initsl(ls, &startline);
   block(ls);  /* 'then' part */
+  slstmtcheck(ls, &isSl, "else|elseif|end");
   if (ls->t.token == TK_ELSE ||
       ls->t.token == TK_ELSEIF)  /* followed by 'else'/'elseif'? */
     lauK_concat(fs, escapelist, lauK_jump(fs));  /* must jump over it */
@@ -2009,7 +2012,9 @@ static void retstat (LexState *ls) {
 
 
 static void statement (LexState *ls) {
-  int line = ls->linenumber;  /* may be needed for error messages */
+  int line =ls->linenumber;  /* may be needed for error messages */
+  if (ls->slStartLine == line)
+    ls->slStmtCount++;
   enterlevel(ls);
   switch (ls->t.token) {
     case TK_IF: {  /* stat -> ifstat */
@@ -2021,17 +2026,16 @@ static void statement (LexState *ls) {
       break;
     }
     case TK_DO: {  /* stat -> DO block END */
+      int startline = ls->linenumber;
       lauX_next(ls);  /* skip DO */
+      int isSl = initsl(ls, &startline);
       block(ls);
+      slstmtcheck(ls, &isSl, "end");
       check_match(ls, TK_END, TK_DO, line);
       break;
     }
     case TK_FOR: {  /* stat -> forstat */
       forstat(ls, line);
-      break;
-    }
-    case TK_REPEAT: {  /* stat -> repeatstat */
-      repeatstat(ls, line);
       break;
     }
     case TK_FUNCTION: {  /* stat -> funcstat */

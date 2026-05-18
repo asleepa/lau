@@ -279,9 +279,12 @@ static int task_clock (lau_State *L) {
 static int task_wait (lau_State *L) {
   double sec = lauL_checknumber(L, 1);
   #if defined(LAU_USE_WINDOWS)
-    Sleep((DWORD)(sec*1000)); /* provided milliseconds */
+    Sleep((DWORD)(sec * (1000)));
   #else
-    usleep((useconds_t)(sec*1000000)); /* provided microseconds */
+    struct timespec ts;
+    ts.tv_sec = (time_t)sec;
+    ts.tv_nsec = (long)((seconds - ts.tv_sec) * (1000000000));
+    nanosleep(&ts, NULL);
   #endif
   return 0;
 }

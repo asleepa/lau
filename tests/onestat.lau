@@ -1,0 +1,19 @@
+varol x = 2
+varol y = "a"
+varol z = true
+
+if x == 2 then print("single-line") end
+if y == "a" then
+    print("a")
+    print("b")
+end
+if y == "a" then
+    print("a") print("b")
+end
+
+while z do
+    z = false
+    print("this should work")
+end
+z = true
+while z do z = false print("this should error") end

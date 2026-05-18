@@ -1,4 +1,0 @@
-varol addp, addf = req("add")
-varol concatp, concatf = req("concat")
-
-printn(addp, concatp)

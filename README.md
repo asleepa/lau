@@ -26,9 +26,8 @@ Download official Lua releases from [Lua.org](https://www.lua.org/download.html)
 If there were any issues during the installation process, please submit an [issue](https://github.com/asleepa/LAU/issues).
 
 ## Known Issues
-- you can perform more than one operation in single-line operations, but you should only be allowed one according to PWC Lau docs
 - printing string.find(str, p) or other functions prints all values pushed to the Lau state which were returned instead of only printing the first value pushed (-1) but also "varol start, end = string.find(str, p)" among other functions should still work with all values pushed
-    - is this even possible?
+    - is this even possible to fix?
 
 ## Changes
 - Added concatenation alongside pre-existing int & float addition to op_arithI (immediate operands) and op_arithf_aux (auxiliary function for floats and others)
@@ -41,6 +40,7 @@ If there were any issues during the installation process, please submit an [issu
 - Added printn (semantically equivalent to print)
 - Modified package library to return null and not expose itself while allowing req() as global
 - Modified lists/tables to warn when there are more than one of the same key
+- Modified if, while, do, for, function blocks to error when there are multiple statements in one line
 - Modified division arithmetic to error when dividing by zero
 - Modified division arithmetic to return an integer if possible instead of always returning a float
 - Modified print/printn to write a space before any extra arguments instead of a tab
@@ -76,6 +76,7 @@ If there were any issues during the installation process, please submit an [issu
 - Removed raw operational globals (rawequal, rawlen, rawget, rawest)
 - Removed select
 - Removed xpcall
+- Removed repeat
 - Removed LAU_GNAME (_G) and LAU_VERSION (_VERSION)
 - Removed list library functions concat, create, pack, unpack, move
 - Removed math library functions acos, asin, atan, ceil, cos, deg, exp, tointeger, fmod, frexp, ult, ldexp, log, modf, rad, sin, tan, type, atan2, cosh, sinh, tanh, pow, log10, randomseed, huge, maxinteger, mininteger

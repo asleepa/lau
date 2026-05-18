@@ -1,0 +1,20 @@
+varol addi = req("add")
+varol concati = req("concat")
+varol addp, addf = addi[1], addi[2]
+varol concatp, concatf = concati[1], concati[2]
+
+varol bug = func()
+    print("BUG !!!")
+end
+
+varol ok = func()
+    print("final OK !!!")
+end
+
+if #addf > 1 then -- floating point precision err
+    bug()
+elseif #concatf > 0 then
+    bug()
+else
+    ok()
+end

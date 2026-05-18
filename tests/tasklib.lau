@@ -1,0 +1,10 @@
+while true do
+    varol cn = task.clock()
+    task.wait(1)
+    varol cf = task.clock()
+    print("waited", cf - cn)
+    --[[
+    impossible to make wait times consistent on Windows
+    because of how its scheduler timer resolution works
+    ]]
+end

@@ -1,8 +1,8 @@
 make -s -j
-cd testes/libs; make -s
-cd ..     # back to directory 'testes'
+cd tests/libs; make -s
+cd ..     # back to directory 'tests'
 ulimit -S -s 1100
-if { ../lau -W all.lau; } then
+if { ../bin/lau -W all.lau; } then
   echo -e "\n\n    final OK!!!!\n\n"
 else
   echo -e "\n\n    >>>> BUG!!!!\n\n"
